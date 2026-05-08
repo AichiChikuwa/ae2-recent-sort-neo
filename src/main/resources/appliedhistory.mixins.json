@@ -1,0 +1,21 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.meatwo310.appliedaccesssort.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "ae2.MEStorageMenuMixin",
+    "ae2.CraftAmountMenuMixin",
+    "ae2.CraftConfirmMenuMixin",
+    "ae2.RepoMixin",
+    "ae2.AEBaseScreenAccessor",
+    "ae2.VerticalButtonBarAccessor",
+    "ae2.MEStorageScreenMixin"
+  ],
+  "client": [
+    "ae2.AEKeyRenderingMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

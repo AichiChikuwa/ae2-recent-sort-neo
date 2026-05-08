@@ -1,0 +1,17 @@
+{
+  "tooltip.appliedhistory.history": "История",
+  "tooltip.appliedhistory.toggle.enabled": "Включено",
+  "tooltip.appliedhistory.toggle.disabled": "Отключено",
+  "tooltip.appliedhistory.history.detail": "%1$s: %2$s, %3$s назад.",
+  "tooltip.appliedhistory.action.imported": "Импортировано",
+  "tooltip.appliedhistory.action.exported": "Экспортировано",
+  "tooltip.appliedhistory.action.requested": "Запрошено",
+  "tooltip.appliedhistory.age.second": "%s секунда",
+  "tooltip.appliedhistory.age.seconds": "%s секунд",
+  "tooltip.appliedhistory.age.minute": "%s минута",
+  "tooltip.appliedhistory.age.minutes": "%s минут",
+  "tooltip.appliedhistory.age.hour": "%s час",
+  "tooltip.appliedhistory.age.hours": "%s часов",
+  "tooltip.appliedhistory.age.day": "%s день",
+  "tooltip.appliedhistory.age.days": "%s дней"
+}

@@ -1,0 +1,22 @@
+# gradle
+.gradle/
+build/
+
+# runtime/dev outputs
+run/
+bin/
+out/
+
+# logs
+*.log
+logs/
+
+# ide
+.idea/
+.vscode/*
+!.vscode/launch.json
+*.iml
+
+# os
+.DS_Store
+Thumbs.db

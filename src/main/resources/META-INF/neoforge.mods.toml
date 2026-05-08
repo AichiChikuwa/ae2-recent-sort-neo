@@ -1,0 +1,38 @@
+modLoader = "javafml"
+loaderVersion = "[1,)"
+license = "GPL-3.0"
+
+[[mods]]
+modId = "appliedhistory"
+version = "${file.jarVersion}"
+displayName = "Applied History"
+logoFile = "logo.png"
+authors = "Aichi_Chikuwa"
+description = '''
+Adds RS-style last-modified history rows to AE2 terminals.
+'''
+
+[[mixins]]
+config = "appliedhistory.mixins.json"
+
+[[dependencies.appliedhistory]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21.1.0,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.appliedhistory]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21.1]"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.appliedhistory]]
+modId = "ae2"
+type = "required"
+versionRange = "[0,)"
+ordering = "AFTER"
+side = "BOTH"
+

@@ -1,0 +1,60 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.74'
+}
+
+group = modGroup
+version = modVersion
+
+base {
+    archivesName = "${modId}-${minecraftVersion}-neo"
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url = 'https://api.modrinth.com/maven' }
+    maven { url = 'https://maven.shedaniel.me/' }
+    maven { url = 'https://www.cursemaven.com' }
+}
+
+dependencies {
+    implementation "org.appliedenergistics:guideme:21.1.1"
+    compileOnly "org.appliedenergistics:appliedenergistics2:0.0.0-SNAPSHOT"
+}
+
+neoForge {
+    version = neoVersion
+
+    parchment {
+        minecraftVersion = parchmentMinecraftVersion
+        mappingsVersion = parchmentMappingsVersion
+    }
+
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+            programArgument '--nogui'
+        }
+    }
+
+    mods {
+        "${modId}" {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+

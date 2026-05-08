@@ -1,0 +1,8 @@
+rootProject.name = "applied-history"
+
+includeBuild("../Applied-Energistics-2-1.21.1") {
+    dependencySubstitution {
+        substitute(module("org.appliedenergistics:appliedenergistics2")).using(project(":"))
+    }
+}
+

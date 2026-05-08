@@ -1,0 +1,17 @@
+{
+  "tooltip.appliedhistory.history": "기록",
+  "tooltip.appliedhistory.toggle.enabled": "활성화됨",
+  "tooltip.appliedhistory.toggle.disabled": "비활성화됨",
+  "tooltip.appliedhistory.history.detail": "%2$s님이 %3$s 전에 %1$s함.",
+  "tooltip.appliedhistory.action.imported": "반입",
+  "tooltip.appliedhistory.action.exported": "반출",
+  "tooltip.appliedhistory.action.requested": "요청",
+  "tooltip.appliedhistory.age.second": "%s초",
+  "tooltip.appliedhistory.age.seconds": "%s초",
+  "tooltip.appliedhistory.age.minute": "%s분",
+  "tooltip.appliedhistory.age.minutes": "%s분",
+  "tooltip.appliedhistory.age.hour": "%s시간",
+  "tooltip.appliedhistory.age.hours": "%s시간",
+  "tooltip.appliedhistory.age.day": "%s일",
+  "tooltip.appliedhistory.age.days": "%s일"
+}

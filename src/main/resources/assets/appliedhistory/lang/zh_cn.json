@@ -1,0 +1,17 @@
+{
+  "tooltip.appliedhistory.history": "历史",
+  "tooltip.appliedhistory.toggle.enabled": "已启用",
+  "tooltip.appliedhistory.toggle.disabled": "已禁用",
+  "tooltip.appliedhistory.history.detail": "%2$s 于 %3$s前%1$s。",
+  "tooltip.appliedhistory.action.imported": "导入",
+  "tooltip.appliedhistory.action.exported": "导出",
+  "tooltip.appliedhistory.action.requested": "请求",
+  "tooltip.appliedhistory.age.second": "%s秒",
+  "tooltip.appliedhistory.age.seconds": "%s秒",
+  "tooltip.appliedhistory.age.minute": "%s分钟",
+  "tooltip.appliedhistory.age.minutes": "%s分钟",
+  "tooltip.appliedhistory.age.hour": "%s小时",
+  "tooltip.appliedhistory.age.hours": "%s小时",
+  "tooltip.appliedhistory.age.day": "%s天",
+  "tooltip.appliedhistory.age.days": "%s天"
+}

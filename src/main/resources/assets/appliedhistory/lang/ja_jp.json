@@ -1,0 +1,17 @@
+{
+  "tooltip.appliedhistory.history": "履歴",
+  "tooltip.appliedhistory.toggle.enabled": "有効",
+  "tooltip.appliedhistory.toggle.disabled": "無効",
+  "tooltip.appliedhistory.history.detail": "%2$s が %3$s前に %1$s。",
+  "tooltip.appliedhistory.action.imported": "インポートしました",
+  "tooltip.appliedhistory.action.exported": "エクスポートしました",
+  "tooltip.appliedhistory.action.requested": "要求しました",
+  "tooltip.appliedhistory.age.second": "%s秒",
+  "tooltip.appliedhistory.age.seconds": "%s秒",
+  "tooltip.appliedhistory.age.minute": "%s分",
+  "tooltip.appliedhistory.age.minutes": "%s分",
+  "tooltip.appliedhistory.age.hour": "%s時間",
+  "tooltip.appliedhistory.age.hours": "%s時間",
+  "tooltip.appliedhistory.age.day": "%s日",
+  "tooltip.appliedhistory.age.days": "%s日"
+}

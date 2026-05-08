@@ -1,0 +1,17 @@
+{
+  "tooltip.appliedhistory.history": "Verlauf",
+  "tooltip.appliedhistory.toggle.enabled": "Aktiviert",
+  "tooltip.appliedhistory.toggle.disabled": "Deaktiviert",
+  "tooltip.appliedhistory.history.detail": "%1$s von %2$s vor %3$s.",
+  "tooltip.appliedhistory.action.imported": "Importiert",
+  "tooltip.appliedhistory.action.exported": "Exportiert",
+  "tooltip.appliedhistory.action.requested": "Angefordert",
+  "tooltip.appliedhistory.age.second": "%s Sekunde",
+  "tooltip.appliedhistory.age.seconds": "%s Sekunden",
+  "tooltip.appliedhistory.age.minute": "%s Minute",
+  "tooltip.appliedhistory.age.minutes": "%s Minuten",
+  "tooltip.appliedhistory.age.hour": "%s Stunde",
+  "tooltip.appliedhistory.age.hours": "%s Stunden",
+  "tooltip.appliedhistory.age.day": "%s Tag",
+  "tooltip.appliedhistory.age.days": "%s Tage"
+}
