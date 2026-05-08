@@ -58,3 +58,13 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
+tasks.named('processResources', ProcessResources).configure {
+    var replaceProperties = [
+            file: [jarVersion: project.version]
+    ]
+    inputs.properties(replaceProperties)
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand(replaceProperties)
+    }
+}
+
