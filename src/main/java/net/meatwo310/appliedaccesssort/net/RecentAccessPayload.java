@@ -20,7 +20,8 @@ public record RecentAccessPayload(
         Map<AEKey, Long> history,
         Map<AEKey, RecentInteractionInfo> details,
         boolean historyPinEnabled,
-        int maxHistoryRows
+        int maxHistoryRows,
+        boolean freezeReorderPulse
 ) implements CustomPacketPayload {
     public static final Type<RecentAccessPayload> type = new Type<>(
             ResourceLocation.fromNamespaceAndPath(Constants.modId, "recent_access")
@@ -47,6 +48,8 @@ public record RecentAccessPayload(
             RecentAccessPayload::historyPinEnabled,
             ByteBufCodecs.INT,
             RecentAccessPayload::maxHistoryRows,
+            ByteBufCodecs.BOOL,
+            RecentAccessPayload::freezeReorderPulse,
             RecentAccessPayload::new
     );
 
@@ -61,6 +64,9 @@ public record RecentAccessPayload(
             ClientRecentAccessState.replaceDetails(payload.containerId, payload.details);
             ClientRecentAccessState.setRecentPinEnabled(payload.containerId, payload.historyPinEnabled);
             ClientRecentAccessState.setMaxHistoryRows(payload.containerId, payload.maxHistoryRows);
+            if (payload.freezeReorderPulse) {
+                ClientRecentAccessState.triggerHistoryReorderFreeze(payload.containerId);
+            }
         });
     }
 }

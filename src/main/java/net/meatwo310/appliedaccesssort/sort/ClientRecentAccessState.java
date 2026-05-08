@@ -18,6 +18,7 @@ public final class ClientRecentAccessState {
     private static final Map<Integer, Integer> pinnedRowCountByContainer = new HashMap<>();
     private static final Map<Integer, Integer> maxHistoryRowsByContainer = new HashMap<>();
     private static final Map<Integer, Boolean> autoCraftPinnedRowByContainer = new HashMap<>();
+    private static final Map<Integer, Boolean> historyReorderFrozenByContainer = new HashMap<>();
     private static final Set<Integer> dirtyContainers = new HashSet<>();
 
     public static void replaceHistory(int containerId, Map<AEKey, Long> history) {
@@ -58,6 +59,19 @@ public final class ClientRecentAccessState {
 
     public static int getMaxHistoryRows(int containerId) {
         return maxHistoryRowsByContainer.getOrDefault(containerId, 5);
+    }
+
+    public static void setHistoryReorderFrozen(int containerId, boolean frozen) {
+        historyReorderFrozenByContainer.put(containerId, frozen);
+        dirtyContainers.add(containerId);
+    }
+
+    public static void triggerHistoryReorderFreeze(int containerId) {
+        setHistoryReorderFrozen(containerId, true);
+    }
+
+    public static boolean isHistoryReorderFrozen(int containerId) {
+        return historyReorderFrozenByContainer.getOrDefault(containerId, false);
     }
 
     public static int getPinnedRowCount(int containerId) {

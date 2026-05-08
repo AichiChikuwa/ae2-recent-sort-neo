@@ -13,6 +13,7 @@ import net.meatwo310.appliedaccesssort.Constants;
 import net.meatwo310.appliedaccesssort.net.RecentPinTogglePayload;
 import net.meatwo310.appliedaccesssort.sort.ClientRecentAccessState;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -78,6 +79,11 @@ public abstract class MEStorageScreenMixin {
     private void refreshOnHistoryUpdate(CallbackInfo ci) {
         MEStorageScreen<?> screen = (MEStorageScreen<?>) (Object) this;
         int containerId = screen.getMenu().containerId;
+        if (ClientRecentAccessState.isHistoryReorderFrozen(containerId) && !Screen.hasShiftDown()) {
+            ClientRecentAccessState.setHistoryReorderFrozen(containerId, false);
+            repo.updateView();
+            adjustScrollbarForPinnedRows();
+        }
         if (recentPinToggleButton != null) {
             var latestEnabled = ClientRecentAccessState.isRecentPinEnabled(containerId);
             if (recentPinToggleButton.isEnabledState() != latestEnabled) {

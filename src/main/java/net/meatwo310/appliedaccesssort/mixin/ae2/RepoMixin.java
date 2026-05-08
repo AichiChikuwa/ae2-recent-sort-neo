@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -41,12 +42,41 @@ public abstract class RepoMixin {
 
     @Inject(method = "updateView", at = @At("TAIL"))
     private void applyRecentPinRows(CallbackInfo ci) {
-        recentPinnedEntries.clear();
         if (!(sortSrc instanceof MEStorageScreen<?> screen)) {
             return;
         }
         var containerId = screen.getMenu().containerId;
         ClientRecentAccessState.setAutoCraftPinnedRowPresent(containerId, !pinnedRow.isEmpty());
+
+        // keep ordering frozen, but refresh entry data from the latest view
+        if (ClientRecentAccessState.isHistoryReorderFrozen(containerId)) {
+            if (recentPinnedEntries.isEmpty()) {
+                return;
+            }
+            var latestEntriesByKey = new HashMap<appeng.api.stacks.AEKey, GridInventoryEntry>();
+            for (var entry : view) {
+                latestEntriesByKey.put(entry.getWhat(), entry);
+            }
+            var refreshedPinnedEntries = new ArrayList<GridInventoryEntry>(recentPinnedEntries.size());
+            for (var entry : recentPinnedEntries) {
+                var refreshed = latestEntriesByKey.get(entry.getWhat());
+                if (refreshed != null) {
+                    refreshedPinnedEntries.add(refreshed);
+                }
+            }
+            recentPinnedEntries.clear();
+            recentPinnedEntries.addAll(refreshedPinnedEntries);
+            view.removeAll(recentPinnedEntries);
+            ClientRecentAccessState.setPinnedRowCount(containerId, (recentPinnedEntries.size() + rowSize - 1) / rowSize);
+            var pinnedKeys = new HashSet<appeng.api.stacks.AEKey>();
+            for (var entry : recentPinnedEntries) {
+                pinnedKeys.add(entry.getWhat());
+            }
+            ClientRecentAccessState.setRecentPinnedKeys(containerId, pinnedKeys);
+            return;
+        }
+
+        recentPinnedEntries.clear();
         if (!ClientRecentAccessState.isRecentPinEnabled(containerId)) {
             ClientRecentAccessState.setPinnedRowCount(containerId, 0);
             ClientRecentAccessState.setRecentPinnedKeys(containerId, new HashSet<>());

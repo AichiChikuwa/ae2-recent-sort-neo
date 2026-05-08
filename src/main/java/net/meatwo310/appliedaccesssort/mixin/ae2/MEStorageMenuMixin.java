@@ -48,6 +48,8 @@ public abstract class MEStorageMenuMixin {
     private AEKey putCarriedBeforeKey;
     @Unique
     private int putCarriedBeforeCount;
+    @Unique
+    private boolean freezeReorderPulse;
 
     @Inject(method = "handleNetworkInteraction", at = @At("HEAD"))
     private void captureBeforeInteraction(ServerPlayer player, @Nullable AEKey clickedKey, InventoryAction action, CallbackInfo ci) {
@@ -84,6 +86,10 @@ public abstract class MEStorageMenuMixin {
     @Inject(method = "handleNetworkInteraction", at = @At("TAIL"))
     private void trackInteraction(ServerPlayer player, @Nullable AEKey clickedKey, InventoryAction action, CallbackInfo ci) {
         debugChat(player, "tail action=" + trackedAction + " clicked=" + debugKey(clickedKey));
+        if (action == InventoryAction.SHIFT_CLICK && clickedKey != null) {
+            // shift-click exporting from terminal grid should freeze client row reorder until shift is released
+            freezeReorderPulse = true;
+        }
         if (trackedAction == InventoryAction.AUTO_CRAFT) {
             if (clickedKey != null) {
                 debugChat(player, "tail classify=requested key=" + debugKey(clickedKey));
@@ -102,6 +108,7 @@ public abstract class MEStorageMenuMixin {
             return;
         }
 
+        boolean trackedByDelta = false;
         for (var entry : trackedBeforeAmounts.entrySet()) {
             var key = entry.getKey();
             long before = entry.getValue();
@@ -110,9 +117,18 @@ public abstract class MEStorageMenuMixin {
             if (after > before) {
                 debugChat(player, "tail classify=inserted key=" + debugKey(key));
                 sendTrackingUpdate(player, key, RecentInteractionAction.inserted);
+                trackedByDelta = true;
             } else if (after < before) {
                 debugChat(player, "tail classify=extracted key=" + debugKey(key));
                 sendTrackingUpdate(player, key, RecentInteractionAction.extracted);
+                trackedByDelta = true;
+            }
+        }
+        if (!trackedByDelta) {
+            var fallbackAction = classifyWithoutDelta(clickedKey, action);
+            if (fallbackAction != null && clickedKey != null) {
+                debugChat(player, "tail classify=fallback " + fallbackAction + " key=" + debugKey(clickedKey));
+                sendTrackingUpdate(player, clickedKey, fallbackAction);
             }
         }
         trackedBeforeAmounts.clear();
@@ -155,7 +171,8 @@ public abstract class MEStorageMenuMixin {
                 history,
                 details,
                 ServerRecentAccessTracker.isHistoryPinEnabled(gridNode),
-                Math.max(1, ServerConfig.historyRows.get())
+                Math.max(1, ServerConfig.historyRows.get()),
+                consumeFreezeReorderPulse()
         );
         PacketDistributor.sendToPlayer(serverPlayer, payload);
     }
@@ -178,7 +195,8 @@ public abstract class MEStorageMenuMixin {
                 ServerRecentAccessTracker.snapshotHistory(gridNode),
                 ServerRecentAccessTracker.snapshotDetails(gridNode),
                 ServerRecentAccessTracker.isHistoryPinEnabled(gridNode),
-                Math.max(1, ServerConfig.historyRows.get())
+                Math.max(1, ServerConfig.historyRows.get()),
+                consumeFreezeReorderPulse()
         );
         PacketDistributor.sendToPlayer(player, payload);
     }
@@ -221,6 +239,45 @@ public abstract class MEStorageMenuMixin {
     @Unique
     private String debugKey(@Nullable AEKey key) {
         return key == null ? "null" : key.toString();
+    }
+
+    @Unique
+    private boolean consumeFreezeReorderPulse() {
+        boolean pulse = freezeReorderPulse;
+        freezeReorderPulse = false;
+        return pulse;
+    }
+
+    @Unique
+    private @Nullable RecentInteractionAction classifyWithoutDelta(@Nullable AEKey clickedKey, InventoryAction action) {
+        if (clickedKey == null) {
+            return null;
+        }
+        var carriedAfterKey = AEItemKey.of(((MEStorageMenu) (Object) this).getCarried());
+        int carriedAfterCount = ((MEStorageMenu) (Object) this).getCarried().getCount();
+
+        if (action == InventoryAction.SHIFT_CLICK) {
+            return RecentInteractionAction.extracted;
+        }
+
+        if (action == InventoryAction.PICKUP_OR_SET_DOWN
+                || action == InventoryAction.SPLIT_OR_PLACE_SINGLE
+                || action == InventoryAction.ROLL_DOWN) {
+            if (carriedBeforeKey != null && carriedBeforeKey.equals(clickedKey)) {
+                if (carriedAfterCount > carriedBeforeCount) {
+                    return RecentInteractionAction.extracted;
+                }
+                if (carriedAfterCount < carriedBeforeCount) {
+                    return RecentInteractionAction.inserted;
+                }
+            } else if (carriedBeforeKey == null && carriedAfterKey != null && carriedAfterKey.equals(clickedKey)) {
+                if (carriedAfterCount > 0) {
+                    return RecentInteractionAction.extracted;
+                }
+            }
+        }
+
+        return null;
     }
 }
 

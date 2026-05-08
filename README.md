@@ -1,11 +1,13 @@
 # Applied History
 
+*This mod is made by human with help from AI.*
+
 Applied History is a NeoForge mod for Minecraft 1.21.1 that extends Applied Energistics 2 (AE2) terminals with a recent-history pin system.
 
 ## What
 
 - adds a dedicated `History` toggle button under AE2's sort button
-- pins recently interacted items in terminal rows (not a full sort replacement)
+- pins recently interacted items in terminal rows *(not a full sort replacement)*
 - tracks interactions such as import, export, and autocraft requests
 - appends a history sentence to item tooltips (when history is enabled)
 - stores history server-side per ME network.

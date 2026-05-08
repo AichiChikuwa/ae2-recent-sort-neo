@@ -175,15 +175,34 @@ public final class ServerRecentAccessTracker {
 
     private static String getNodeKey(IGridNode node) {
         var level = node.getLevel();
-        var owner = node.getOwner();
-        var dim = level.dimension().location().toString();
+        if (level == null) {
+            return null;
+        }
+
+        // Scope history to AE2 network identity, not terminal host.
+        // Using the pivot node owner makes all terminals in the same grid share history.
+        var grid = node.getGrid();
+        var pivot = grid == null ? null : grid.getPivot();
+        if (pivot != null) {
+            var ownerKey = ownerKey(level, pivot.getOwner());
+            if (ownerKey != null) {
+                return level.dimension().location() + "|grid|" + ownerKey;
+            }
+        }
+
+        // Fallback should be rare, but keeps behavior stable if pivot/owner is unavailable.
+        var fallbackOwnerKey = ownerKey(level, node.getOwner());
+        return fallbackOwnerKey == null ? null : level.dimension().location() + "|grid-fallback|" + fallbackOwnerKey;
+    }
+
+    private static String ownerKey(ServerLevel level, Object owner) {
         if (owner instanceof BlockEntity blockEntity) {
-            return dim + "|be|" + blockEntity.getBlockPos().asLong();
+            return "be|" + blockEntity.getBlockPos().asLong();
         }
         if (owner instanceof AEBasePart part && part.getBlockEntity() != null) {
-            return dim + "|part|" + part.getBlockEntity().getBlockPos().asLong() + "|" + part.getSide().getName();
+            return "part|" + part.getBlockEntity().getBlockPos().asLong() + "|" + part.getSide().getName();
         }
-        return dim + "|owner|" + owner.getClass().getName() + "|" + System.identityHashCode(owner);
+        return "owner|" + owner.getClass().getName() + "|" + System.identityHashCode(owner);
     }
 }
 
