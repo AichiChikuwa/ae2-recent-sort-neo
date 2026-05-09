@@ -10,6 +10,8 @@
     "ae2.RepoMixin",
     "ae2.AEBaseScreenAccessor",
     "ae2.VerticalButtonBarAccessor",
+    "ae2.MEStorageScreenAccessor",
+    "ae2.RepoViewAccessor",
     "ae2.MEStorageScreenMixin"
   ],
   "client": [

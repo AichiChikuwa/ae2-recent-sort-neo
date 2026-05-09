@@ -27,6 +27,9 @@ public class AEKeyRenderingMixin {
         if (!ClientRecentAccessState.isRecentPinEnabled(containerId)) {
             return;
         }
+        if (!ClientRecentAccessState.isRecentPinnedKey(containerId, stack)) {
+            return;
+        }
         var info = ClientRecentAccessState.getDetails(containerId, stack);
         if (info == null) {
             return;

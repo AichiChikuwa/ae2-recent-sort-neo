@@ -4,6 +4,12 @@
 
 Applied History is a NeoForge mod for Minecraft 1.21.1 that extends Applied Energistics 2 (AE2) terminals with a recent-history pin system.
 
+![b74wF.gif](https://s13.gifyu.com/images/b74wF.gif)
+![b74wU.gif](https://s13.gifyu.com/images/b74wU.gif)
+![b74wV.gif](https://s13.gifyu.com/images/b74wV.gif)
+![b74wZ.gif](https://s13.gifyu.com/images/b74wZ.gif)
+
+
 ## What
 
 - adds a dedicated `History` toggle button under AE2's sort button

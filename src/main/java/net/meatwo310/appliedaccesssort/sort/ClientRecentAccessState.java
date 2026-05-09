@@ -16,6 +16,7 @@ public final class ClientRecentAccessState {
     private static final Map<Integer, Set<AEKey>> recentPinnedKeysByContainer = new HashMap<>();
     private static final Map<Integer, Boolean> recentPinEnabledByContainer = new HashMap<>();
     private static final Map<Integer, Integer> pinnedRowCountByContainer = new HashMap<>();
+    private static final Map<Integer, Integer> recentPrioritySlotCountByContainer = new HashMap<>();
     private static final Map<Integer, Integer> maxHistoryRowsByContainer = new HashMap<>();
     private static final Map<Integer, Boolean> autoCraftPinnedRowByContainer = new HashMap<>();
     private static final Map<Integer, Boolean> historyReorderFrozenByContainer = new HashMap<>();
@@ -76,6 +77,23 @@ public final class ClientRecentAccessState {
 
     public static int getPinnedRowCount(int containerId) {
         return pinnedRowCountByContainer.getOrDefault(containerId, 0);
+    }
+
+    public static void setRecentPrioritySlotCount(int containerId, int slotCount) {
+        recentPrioritySlotCountByContainer.put(containerId, Math.max(0, slotCount));
+    }
+
+    public static int getRecentPrioritySlotCount(int containerId) {
+        return recentPrioritySlotCountByContainer.getOrDefault(containerId, 0);
+    }
+
+    public static int getRecentPriorityPaddingSlots(int containerId, int rowSize) {
+        int slotCount = getRecentPrioritySlotCount(containerId);
+        if (rowSize <= 0 || slotCount <= 0) {
+            return 0;
+        }
+        int rounded = ((slotCount + rowSize - 1) / rowSize) * rowSize;
+        return rounded - slotCount;
     }
 
     public static void setAutoCraftPinnedRowPresent(int containerId, boolean present) {

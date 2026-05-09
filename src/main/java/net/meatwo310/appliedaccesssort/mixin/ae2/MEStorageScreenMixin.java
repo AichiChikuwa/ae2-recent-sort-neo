@@ -105,32 +105,68 @@ public abstract class MEStorageScreenMixin {
     private void drawRecentPinnedRowsOverlay(GuiGraphics guiGraphics, int offsetX, int offsetY, int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
         MEStorageScreen<?> screen = (MEStorageScreen<?>) (Object) this;
         int containerId = screen.getMenu().containerId;
-        int recentRows = ClientRecentAccessState.getPinnedRowCount(containerId);
-        if (recentRows <= 0) {
+        if (!ClientRecentAccessState.isRecentPinEnabled(containerId)) {
+            return;
+        }
+        int historyRows = ClientRecentAccessState.getPinnedRowCount(containerId);
+        if (historyRows <= 0) {
             return;
         }
 
-        int firstRecentRowIndex = ClientRecentAccessState.hasAutoCraftPinnedRow(containerId) ? 1 : 0;
-        int startY = offsetY + style.getHeader().getSrcHeight() + (firstRecentRowIndex * style.getRow().getSrcHeight());
-        for (int i = 0; i < recentRows; i++) {
-            Blitter.texture(historyRowTexture, 162, 18)
-                    .src(0, 0, 162, 18)
-                    .dest(offsetX + 7, startY + i * style.getRow().getSrcHeight())
-                    .blit(guiGraphics);
+        int rowPixelHeight = style.getRow().getSrcHeight();
+        int slotsPerRow = style.getSlotsPerRow();
+        boolean autocraft = ClientRecentAccessState.hasAutoCraftPinnedRow(containerId);
+        int gridInnerWidth = slotsPerRow * 18;
+        int gridLeft = offsetX + 7;
+        int gridTop = offsetY + style.getHeader().getSrcHeight();
+        int gridBottom = gridTop + this.rows * rowPixelHeight;
+
+        guiGraphics.enableScissor(gridLeft, gridTop, gridLeft + gridInnerWidth, gridBottom);
+        try {
+            int drawnRows = 0;
+            for (int r = 0; r < this.rows; r++) {
+                if (autocraft && r == 0) {
+                    continue;
+                }
+                boolean rowHasHistory = false;
+                int base = autocraft ? slotsPerRow : 0;
+                int mainRow = r - (autocraft ? 1 : 0);
+                for (int c = 0; c < slotsPerRow; c++) {
+                    int idx = base + mainRow * slotsPerRow + c;
+                    var entry = this.repo.get(idx);
+                    if (entry != null && ClientRecentAccessState.isRecentPinnedKey(containerId, entry.getWhat())) {
+                        rowHasHistory = true;
+                        break;
+                    }
+                }
+                if (!rowHasHistory) {
+                    continue;
+                }
+                int y = gridTop + r * rowPixelHeight;
+                Blitter.texture(historyRowTexture, 162, 18)
+                        .src(0, 0, 162, 18)
+                        .dest(gridLeft, y, gridInnerWidth, rowPixelHeight)
+                        .blit(guiGraphics);
+                drawnRows++;
+                if (drawnRows >= historyRows) {
+                    break;
+                }
+            }
+        } finally {
+            guiGraphics.disableScissor();
         }
     }
 
     private void adjustScrollbarForPinnedRows() {
-        MEStorageScreen<?> screen = (MEStorageScreen<?>) (Object) this;
-        var containerId = screen.getMenu().containerId;
-        int fixedRows = ClientRecentAccessState.getPinnedRowCount(containerId);
-
-        if (ClientRecentAccessState.hasAutoCraftPinnedRow(containerId)) {
-            fixedRows += 1;
-        }
-
-        int totalRows = (this.repo.size() + 8) / 9;
-        this.scrollbar.setRange(0, Math.max(0, totalRows - this.rows - fixedRows), Math.max(1, this.rows / 6));
+        int fixedRows = ClientRecentAccessState.hasAutoCraftPinnedRow(((MEStorageScreen<?>) (Object) this).getMenu().containerId) ? 1 : 0;
+        int containerId = ((MEStorageScreen<?>) (Object) this).getMenu().containerId;
+        int rowSize = this.style.getSlotsPerRow();
+        int viewSize = ((RepoViewAccessor) (Object) this.repo).getScrollableView().size();
+        int paddingSlots = ClientRecentAccessState.getRecentPriorityPaddingSlots(containerId, rowSize);
+        int scrollableRows = (viewSize + paddingSlots + rowSize - 1) / rowSize;
+        int totalContentRows = fixedRows + scrollableRows;
+        int maxScroll = Math.max(0, totalContentRows - this.rows);
+        this.scrollbar.setRange(0, maxScroll, Math.max(1, this.rows / 6));
     }
 
 }
