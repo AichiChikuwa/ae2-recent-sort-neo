@@ -48,7 +48,7 @@ public abstract class CraftConfirmMenuMixin {
         ServerRecentAccessTracker.markInteraction(
                 gridNode,
                 trackedKey,
-                player.getGameProfile().getName(),
+                player.getGameProfile().name(),
                 RecentInteractionAction.requested);
         debugChat(player, "craftConfirm classify=requested key=" + trackedKey);
     }

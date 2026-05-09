@@ -53,85 +53,100 @@ public abstract class MEStorageMenuMixin {
 
     @Inject(method = "handleNetworkInteraction", at = @At("HEAD"))
     private void captureBeforeInteraction(ServerPlayer player, @Nullable AEKey clickedKey, InventoryAction action, CallbackInfo ci) {
-        trackedBeforeAmounts.clear();
-        trackedAction = action;
-        carriedBeforeKey = null;
-        carriedBeforeCount = 0;
-        debugChat(player, "head action=" + action + " clicked=" + debugKey(clickedKey));
+        try {
+            trackedBeforeAmounts.clear();
+            trackedAction = action;
+            carriedBeforeKey = null;
+            carriedBeforeCount = 0;
+            debugChat(player, "head action=" + action + " clicked=" + debugKey(clickedKey));
 
-        if (action == InventoryAction.AUTO_CRAFT) {
-            if (clickedKey != null) {
-                trackedBeforeAmounts.put(clickedKey, readAvailableAmount(clickedKey));
+            if (storage == null) {
+                return;
             }
-            return;
-        }
 
-        Set<AEKey> candidates = new HashSet<>();
-        if (clickedKey != null) {
-            candidates.add(clickedKey);
-        }
-        var carriedBefore = AEItemKey.of(((MEStorageMenu) (Object) this).getCarried());
-        if (carriedBefore != null) {
-            candidates.add(carriedBefore);
-            carriedBeforeKey = carriedBefore;
-            carriedBeforeCount = ((MEStorageMenu) (Object) this).getCarried().getCount();
-            debugChat(player, "head carriedBefore=" + debugKey(carriedBeforeKey) + " count=" + carriedBeforeCount);
-        }
-        for (var key : candidates) {
-            trackedBeforeAmounts.put(key, readAvailableAmount(key));
-            debugChat(player, "head amountBefore " + debugKey(key) + "=" + readAvailableAmount(key));
+            if (action == InventoryAction.AUTO_CRAFT) {
+                if (clickedKey != null) {
+                    trackedBeforeAmounts.put(clickedKey, readAvailableAmount(clickedKey));
+                }
+                return;
+            }
+
+            Set<AEKey> candidates = new HashSet<>();
+            if (clickedKey != null) {
+                candidates.add(clickedKey);
+            }
+            var carriedBefore = AEItemKey.of(((MEStorageMenu) (Object) this).getCarried());
+            if (carriedBefore != null) {
+                candidates.add(carriedBefore);
+                carriedBeforeKey = carriedBefore;
+                carriedBeforeCount = ((MEStorageMenu) (Object) this).getCarried().getCount();
+                debugChat(player, "head carriedBefore=" + debugKey(carriedBeforeKey) + " count=" + carriedBeforeCount);
+            }
+            for (var key : candidates) {
+                trackedBeforeAmounts.put(key, readAvailableAmount(key));
+                debugChat(player, "head amountBefore " + debugKey(key) + "=" + readAvailableAmount(key));
+            }
+        } catch (Throwable ignored) {
         }
     }
 
     @Inject(method = "handleNetworkInteraction", at = @At("TAIL"))
     private void trackInteraction(ServerPlayer player, @Nullable AEKey clickedKey, InventoryAction action, CallbackInfo ci) {
-        debugChat(player, "tail action=" + trackedAction + " clicked=" + debugKey(clickedKey));
-        if (action == InventoryAction.SHIFT_CLICK && clickedKey != null) {
-            // shift-click exporting from terminal grid should freeze client row reorder until shift is released
-            freezeReorderPulse = true;
-        }
-        if (trackedAction == InventoryAction.AUTO_CRAFT) {
-            if (clickedKey != null) {
-                debugChat(player, "tail classify=requested key=" + debugKey(clickedKey));
-                sendTrackingUpdate(player, clickedKey, RecentInteractionAction.requested);
+        try {
+            debugChat(player, "tail action=" + trackedAction + " clicked=" + debugKey(clickedKey));
+            if (action == InventoryAction.SHIFT_CLICK && clickedKey != null) {
+                // shift-click exporting from terminal grid should freeze client row reorder until shift is released
+                freezeReorderPulse = true;
+            }
+            if (storage == null) {
+                trackedBeforeAmounts.clear();
+                return;
+            }
+            if (trackedAction == InventoryAction.AUTO_CRAFT) {
+                if (clickedKey != null) {
+                    debugChat(player, "tail classify=requested key=" + debugKey(clickedKey));
+                    sendTrackingUpdate(player, clickedKey, RecentInteractionAction.requested);
+                }
+                trackedBeforeAmounts.clear();
+                return;
+            }
+
+            if (clickedKey == null
+                    && (trackedAction == InventoryAction.PICKUP_OR_SET_DOWN
+                    || trackedAction == InventoryAction.SPLIT_OR_PLACE_SINGLE
+                    || trackedAction == InventoryAction.ROLL_DOWN)) {
+                // insert tracking for carried-item placement is handled in putCarriedItemIntoNetwork
+                trackedBeforeAmounts.clear();
+                return;
+            }
+
+            boolean trackedByDelta = false;
+            for (var entry : trackedBeforeAmounts.entrySet()) {
+                var key = entry.getKey();
+                long before = entry.getValue();
+                long after = readAvailableAmount(key);
+                debugChat(player, "tail delta key=" + debugKey(key) + " before=" + before + " after=" + after);
+                if (after > before) {
+                    debugChat(player, "tail classify=inserted key=" + debugKey(key));
+                    sendTrackingUpdate(player, key, RecentInteractionAction.inserted);
+                    trackedByDelta = true;
+                } else if (after < before) {
+                    debugChat(player, "tail classify=extracted key=" + debugKey(key));
+                    sendTrackingUpdate(player, key, RecentInteractionAction.extracted);
+                    trackedByDelta = true;
+                }
+            }
+            if (!trackedByDelta) {
+                var fallbackAction = classifyWithoutDelta(clickedKey, action);
+                if (fallbackAction != null && clickedKey != null) {
+                    debugChat(player, "tail classify=fallback " + fallbackAction + " key=" + debugKey(clickedKey));
+                    sendTrackingUpdate(player, clickedKey, fallbackAction);
+                }
             }
             trackedBeforeAmounts.clear();
-            return;
-        }
-
-        if (clickedKey == null
-                && (trackedAction == InventoryAction.PICKUP_OR_SET_DOWN
-                || trackedAction == InventoryAction.SPLIT_OR_PLACE_SINGLE
-                || trackedAction == InventoryAction.ROLL_DOWN)) {
-            // insert tracking for carried-item placement is handled in putCarriedItemIntoNetwork
+        } catch (Throwable ignored) {
             trackedBeforeAmounts.clear();
-            return;
         }
-
-        boolean trackedByDelta = false;
-        for (var entry : trackedBeforeAmounts.entrySet()) {
-            var key = entry.getKey();
-            long before = entry.getValue();
-            long after = readAvailableAmount(key);
-            debugChat(player, "tail delta key=" + debugKey(key) + " before=" + before + " after=" + after);
-            if (after > before) {
-                debugChat(player, "tail classify=inserted key=" + debugKey(key));
-                sendTrackingUpdate(player, key, RecentInteractionAction.inserted);
-                trackedByDelta = true;
-            } else if (after < before) {
-                debugChat(player, "tail classify=extracted key=" + debugKey(key));
-                sendTrackingUpdate(player, key, RecentInteractionAction.extracted);
-                trackedByDelta = true;
-            }
-        }
-        if (!trackedByDelta) {
-            var fallbackAction = classifyWithoutDelta(clickedKey, action);
-            if (fallbackAction != null && clickedKey != null) {
-                debugChat(player, "tail classify=fallback " + fallbackAction + " key=" + debugKey(clickedKey));
-                sendTrackingUpdate(player, clickedKey, fallbackAction);
-            }
-        }
-        trackedBeforeAmounts.clear();
     }
 
     @Inject(method = "transferStackToMenu", at = @At("RETURN"))
@@ -189,7 +204,7 @@ public abstract class MEStorageMenuMixin {
         }
 
         debugChat(player, "track send action=" + action + " key=" + debugKey(key));
-        ServerRecentAccessTracker.markInteraction(gridNode, key, player.getGameProfile().getName(), action);
+        ServerRecentAccessTracker.markInteraction(gridNode, key, player.getGameProfile().name(), action);
         var payload = new RecentAccessPayload(
                 player.containerMenu.containerId,
                 ServerRecentAccessTracker.snapshotHistory(gridNode),
@@ -203,6 +218,9 @@ public abstract class MEStorageMenuMixin {
 
     @Unique
     private long readAvailableAmount(AEKey key) {
+        if (storage == null || key == null) {
+            return 0L;
+        }
         return storage.getAvailableStacks().get(key);
     }
 

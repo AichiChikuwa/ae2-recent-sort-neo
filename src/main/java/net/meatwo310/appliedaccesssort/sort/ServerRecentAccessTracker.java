@@ -186,13 +186,13 @@ public final class ServerRecentAccessTracker {
         if (pivot != null) {
             var ownerKey = ownerKey(level, pivot.getOwner());
             if (ownerKey != null) {
-                return level.dimension().location() + "|grid|" + ownerKey;
+                return level.dimension().identifier() + "|grid|" + ownerKey;
             }
         }
 
         // Fallback should be rare, but keeps behavior stable if pivot/owner is unavailable.
         var fallbackOwnerKey = ownerKey(level, node.getOwner());
-        return fallbackOwnerKey == null ? null : level.dimension().location() + "|grid-fallback|" + fallbackOwnerKey;
+        return fallbackOwnerKey == null ? null : level.dimension().identifier() + "|grid-fallback|" + fallbackOwnerKey;
     }
 
     private static String ownerKey(ServerLevel level, Object owner) {

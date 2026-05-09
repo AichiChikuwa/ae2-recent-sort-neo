@@ -1,8 +1,20 @@
+plugins {
+    id "org.gradle.toolchains.foojay-resolver-convention" version "1.0.0"
+}
+
 rootProject.name = "applied-history"
 
-includeBuild("../Applied-Energistics-2-1.21.1") {
-    dependencySubstitution {
-        substitute(module("org.appliedenergistics:appliedenergistics2")).using(project(":"))
+def ae2SourceDirCandidates = [
+    "../Applied-Energistics-2-26.1.2"
+]
+
+def ae2SourceDir = ae2SourceDirCandidates.collect { file(it) }.find { it.exists() }
+
+if (ae2SourceDir != null) {
+    includeBuild(ae2SourceDir.path) {
+        dependencySubstitution {
+            substitute(module("org.appliedenergistics:appliedenergistics2")).using(project(":"))
+        }
     }
 }
 

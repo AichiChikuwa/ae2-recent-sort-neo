@@ -45,7 +45,7 @@ public abstract class CraftAmountMenuMixin {
         ServerRecentAccessTracker.markInteraction(
                 gridNode,
                 whatToCraft,
-                player.getGameProfile().getName(),
+                player.getGameProfile().name(),
                 RecentInteractionAction.requested);
         debugChat(player, "craftAmount classify=requested key=" + whatToCraft);
     }

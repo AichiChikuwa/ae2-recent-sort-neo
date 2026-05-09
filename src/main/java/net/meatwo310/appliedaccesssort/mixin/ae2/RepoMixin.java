@@ -116,6 +116,14 @@ public abstract class RepoMixin {
             for (var entry : head) {
                 keys.add(entry.getWhat());
             }
+            // include entries shown in AE2's pinned autocrafting row when they also have history,
+            // so tooltip injection works there too.
+            for (var entry : pinnedRow) {
+                var key = entry.getWhat();
+                if (key != null && ClientRecentAccessState.getSequence(containerId, key) > 0L) {
+                    keys.add(key);
+                }
+            }
             ClientRecentAccessState.setRecentPinnedKeys(containerId, keys);
             ClientRecentAccessState.setPinnedRowCount(containerId, (headCount + rowSize - 1) / rowSize);
             ClientRecentAccessState.setRecentPrioritySlotCount(containerId, headCount);

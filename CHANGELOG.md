@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.3-beta] - 2026-05-09
+
+- updated build metadata and mod dependency ranges to target Minecraft 26.1.2
+
 ## [0.1.3] - 2026-05-09
 
 - rewrote history behavior from true pinned rows to top-priority rows inside normal scrollable grid

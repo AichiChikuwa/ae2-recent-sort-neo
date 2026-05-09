@@ -1,8 +1,6 @@
 # Applied History
 
-*This mod is made by human with help from AI.*
-
-Applied History is a NeoForge mod for Minecraft 1.21.1 that extends Applied Energistics 2 (AE2) terminals with a recent-history pin system.
+Applied History is a Minecraft NeoForge mod that extends Applied Energistics 2 (AE2) terminals with a recent-history pin system.
 
 ![b74wF.gif](https://s13.gifyu.com/images/b74wF.gif)
 ![b74wU.gif](https://s13.gifyu.com/images/b74wU.gif)
@@ -30,7 +28,7 @@ Applied History is a NeoForge mod for Minecraft 1.21.1 that extends Applied Ener
 
 ### {insert Minecraft version} support?
 
-- Probably will update it to 26.1.2 when AE2 moves out of alpha.
+- 26.1.2 branch exists as a beta line, while 1.21.1 remains the main stable focus.
 - 1.20.1 backport can be a thing if enough issues are requested.
 - Probably won't support 1.19 or lower. Feel free to fork and do it yourself tho.
 
@@ -49,3 +47,5 @@ History buffer size follows:
 
 This project is licensed under the GNU General Public License v3.0 only.  
 See the `LICENSE` file for full text.
+
+*This mod is made by human with help from AI.*

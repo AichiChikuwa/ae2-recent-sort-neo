@@ -7,7 +7,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
@@ -16,7 +16,7 @@ public record RecentPinTogglePayload(
         boolean enabled
 ) implements CustomPacketPayload {
     public static final Type<RecentPinTogglePayload> type = new Type<>(
-            ResourceLocation.fromNamespaceAndPath(Constants.modId, "recent_pin_toggle")
+            Identifier.fromNamespaceAndPath(Constants.modId, "recent_pin_toggle")
     );
 
     public static final StreamCodec<RegistryFriendlyByteBuf, RecentPinTogglePayload> streamCodec = StreamCodec.composite(

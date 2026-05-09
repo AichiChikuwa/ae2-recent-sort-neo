@@ -1,6 +1,6 @@
 package net.meatwo310.appliedaccesssort.mixin.ae2;
 
-import appeng.api.client.AEKeyRendering;
+import appeng.client.api.AEKeyRendering;
 import appeng.api.stacks.AEKey;
 import appeng.client.gui.me.common.MEStorageScreen;
 import net.meatwo310.appliedaccesssort.sort.ClientRecentAccessState;

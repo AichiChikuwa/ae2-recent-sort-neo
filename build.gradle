@@ -1,6 +1,6 @@
 plugins {
     id 'java-library'
-    id 'net.neoforged.moddev' version '2.0.74'
+    id 'net.neoforged.moddev' version '2.0.141'
 }
 
 group = modGroup
@@ -12,7 +12,7 @@ base {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -25,17 +25,12 @@ repositories {
 }
 
 dependencies {
-    implementation "org.appliedenergistics:guideme:21.1.1"
-    compileOnly "org.appliedenergistics:appliedenergistics2:0.0.0-SNAPSHOT"
+    implementation "org.appliedenergistics:guideme:26.1.10-alpha"
+    compileOnly "org.appliedenergistics:appliedenergistics2:26.1.8-alpha"
 }
 
 neoForge {
     version = neoVersion
-
-    parchment {
-        minecraftVersion = parchmentMinecraftVersion
-        mappingsVersion = parchmentMappingsVersion
-    }
 
     runs {
         client {

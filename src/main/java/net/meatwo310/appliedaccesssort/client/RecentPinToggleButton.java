@@ -1,17 +1,17 @@
 package net.meatwo310.appliedaccesssort.client;
 
-import appeng.client.gui.Icon;
-import appeng.client.gui.style.Blitter;
 import appeng.client.gui.widgets.IconButton;
+import appeng.client.gui.style.Blitter;
+import appeng.util.Icon;
 import net.meatwo310.appliedaccesssort.Constants;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.List;
 
 public class RecentPinToggleButton extends IconButton {
-    private static final ResourceLocation historyToggleTexture = ResourceLocation.fromNamespaceAndPath(
+    private static final Identifier historyToggleTexture = Identifier.fromNamespaceAndPath(
             Constants.modId,
             "history_toggle.png"
     );
@@ -44,27 +44,25 @@ public class RecentPinToggleButton extends IconButton {
 
     @Override
     protected Icon getIcon() {
-        return enabled ? Icon.LOCKED : Icon.UNLOCKED;
+        return Icon.CLEAR;
     }
 
     @Override
-    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partial) {
+    public void extractContents(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partial) {
         if (!this.visible) {
             return;
         }
-        var yOffset = isHovered() ? 1 : 0;
+        int yOffset = isHovered() ? 1 : 0;
         Icon bgIcon = isHovered() ? Icon.TOOLBAR_BUTTON_BACKGROUND_HOVER
                 : isFocused() ? Icon.TOOLBAR_BUTTON_BACKGROUND_FOCUS : Icon.TOOLBAR_BUTTON_BACKGROUND;
-        bgIcon.getBlitter()
+        Blitter.icon(bgIcon)
                 .dest(getX() - 1, getY() + yOffset, 18, 20)
-                .zOffset(2)
                 .blit(guiGraphics);
 
         int srcX = enabled ? 0 : 16;
         Blitter.texture(historyToggleTexture, 32, 16)
                 .src(srcX, 0, 16, 16)
                 .dest(getX(), getY() + 1 + yOffset)
-                .zOffset(3)
                 .blit(guiGraphics);
     }
 
