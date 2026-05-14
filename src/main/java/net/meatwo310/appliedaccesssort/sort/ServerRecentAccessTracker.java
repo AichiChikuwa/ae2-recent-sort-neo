@@ -4,6 +4,7 @@ import appeng.api.networking.IGridNode;
 import appeng.api.stacks.AEKey;
 import appeng.parts.AEBasePart;
 import net.meatwo310.appliedaccesssort.config.ServerConfig;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
@@ -184,23 +185,31 @@ public final class ServerRecentAccessTracker {
         var grid = node.getGrid();
         var pivot = grid == null ? null : grid.getPivot();
         if (pivot != null) {
-            var ownerKey = ownerKey(level, pivot.getOwner());
+            var ownerKey = ownerKey(pivot.getOwner());
             if (ownerKey != null) {
                 return level.dimension().location() + "|grid|" + ownerKey;
             }
         }
 
         // Fallback should be rare, but keeps behavior stable if pivot/owner is unavailable.
-        var fallbackOwnerKey = ownerKey(level, node.getOwner());
+        var fallbackOwnerKey = ownerKey(node.getOwner());
         return fallbackOwnerKey == null ? null : level.dimension().location() + "|grid-fallback|" + fallbackOwnerKey;
     }
 
-    private static String ownerKey(ServerLevel level, Object owner) {
+    private static String ownerKey(Object owner) {
+        if (owner == null) {
+            return null;
+        }
         if (owner instanceof BlockEntity blockEntity) {
             return "be|" + blockEntity.getBlockPos().asLong();
         }
         if (owner instanceof AEBasePart part && part.getBlockEntity() != null) {
-            return "part|" + part.getBlockEntity().getBlockPos().asLong() + "|" + part.getSide().getName();
+            Direction side = part.getSide();
+            if (side != null) {
+                return "part|" + part.getBlockEntity().getBlockPos().asLong() + "|" + side.getName();
+            }
+            // side can be unset while the network is rewiring; use identity when facing is unavailable
+            return "part|" + part.getBlockEntity().getBlockPos().asLong() + "|noside|" + System.identityHashCode(part);
         }
         return "owner|" + owner.getClass().getName() + "|" + System.identityHashCode(owner);
     }

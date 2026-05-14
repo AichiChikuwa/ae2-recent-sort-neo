@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.4] - 2026-05-14
+
+- fix server crash when ME topology changes: `AEBasePart.getSide()` can be null while rewiring; history grid keys now handle null owner and null facing safely
+
 ## [0.1.3] - 2026-05-09
 
 - rewrote history behavior from true pinned rows to top-priority rows inside normal scrollable grid
