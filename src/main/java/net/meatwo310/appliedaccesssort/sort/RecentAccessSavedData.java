@@ -77,6 +77,16 @@ public final class RecentAccessSavedData extends SavedData {
         setDirty();
     }
 
+    // completely forgets a logger's stored history so a purged uuid leaves nothing on disk
+    public void remove(String gridKey) {
+        boolean removed = detailsByGridKey.remove(gridKey) != null;
+        removed |= sequenceByGridKey.remove(gridKey) != null;
+        removed |= historyPinEnabledByGridKey.remove(gridKey) != null;
+        if (removed) {
+            setDirty();
+        }
+    }
+
     public boolean isHistoryPinEnabled(String gridKey) {
         return historyPinEnabledByGridKey.getOrDefault(gridKey, false);
     }

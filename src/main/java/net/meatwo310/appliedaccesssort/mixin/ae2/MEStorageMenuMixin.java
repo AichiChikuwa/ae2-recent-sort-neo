@@ -164,16 +164,7 @@ public abstract class MEStorageMenuMixin {
             return;
         }
 
-        var history = ServerRecentAccessTracker.snapshotHistory(gridNode);
-        var details = ServerRecentAccessTracker.snapshotDetails(gridNode);
-        var payload = new RecentAccessPayload(
-                serverPlayer.containerMenu.containerId,
-                history,
-                details,
-                ServerRecentAccessTracker.isHistoryPinEnabled(gridNode),
-                Math.max(1, ServerConfig.historyRows.get()),
-                consumeFreezeReorderPulse()
-        );
+        var payload = buildRecentAccessPayload(serverPlayer.containerMenu.containerId, gridNode);
         PacketDistributor.sendToPlayer(serverPlayer, payload);
     }
 
@@ -190,15 +181,22 @@ public abstract class MEStorageMenuMixin {
 
         debugChat(player, "track send action=" + action + " key=" + debugKey(key));
         ServerRecentAccessTracker.markInteraction(gridNode, key, player.getGameProfile().getName(), action);
-        var payload = new RecentAccessPayload(
-                player.containerMenu.containerId,
+        var payload = buildRecentAccessPayload(player.containerMenu.containerId, gridNode);
+        PacketDistributor.sendToPlayer(player, payload);
+    }
+
+    @Unique
+    private RecentAccessPayload buildRecentAccessPayload(int containerId, IGridNode gridNode) {
+        return new RecentAccessPayload(
+                containerId,
                 ServerRecentAccessTracker.snapshotHistory(gridNode),
                 ServerRecentAccessTracker.snapshotDetails(gridNode),
                 ServerRecentAccessTracker.isHistoryPinEnabled(gridNode),
                 Math.max(1, ServerConfig.historyRows.get()),
-                consumeFreezeReorderPulse()
+                consumeFreezeReorderPulse(),
+                ServerRecentAccessTracker.hasLogger(gridNode),
+                ServerRecentAccessTracker.hasConflict(gridNode)
         );
-        PacketDistributor.sendToPlayer(player, payload);
     }
 
     @Unique

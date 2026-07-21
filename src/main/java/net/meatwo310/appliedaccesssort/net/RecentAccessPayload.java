@@ -21,7 +21,9 @@ public record RecentAccessPayload(
         Map<AEKey, RecentInteractionInfo> details,
         boolean historyPinEnabled,
         int maxHistoryRows,
-        boolean freezeReorderPulse
+        boolean freezeReorderPulse,
+        boolean hasLogger,
+        boolean loggerConflict
 ) implements CustomPacketPayload {
     public static final Type<RecentAccessPayload> type = new Type<>(
             ResourceLocation.fromNamespaceAndPath(Constants.modId, "recent_access")
@@ -37,20 +39,33 @@ public record RecentAccessPayload(
             RecentInteractionInfo::action,
             RecentInteractionInfo::new
     );
-    public static final StreamCodec<RegistryFriendlyByteBuf, RecentAccessPayload> streamCodec = StreamCodec.composite(
-            ByteBufCodecs.INT,
-            RecentAccessPayload::containerId,
-            ByteBufCodecs.map(Maps::newHashMapWithExpectedSize, AEKey.STREAM_CODEC, ByteBufCodecs.VAR_LONG),
-            RecentAccessPayload::history,
-            ByteBufCodecs.map(Maps::newHashMapWithExpectedSize, AEKey.STREAM_CODEC, infoCodec),
-            RecentAccessPayload::details,
-            ByteBufCodecs.BOOL,
-            RecentAccessPayload::historyPinEnabled,
-            ByteBufCodecs.INT,
-            RecentAccessPayload::maxHistoryRows,
-            ByteBufCodecs.BOOL,
-            RecentAccessPayload::freezeReorderPulse,
-            RecentAccessPayload::new
+    private static final StreamCodec<RegistryFriendlyByteBuf, Map<AEKey, Long>> historyCodec =
+            ByteBufCodecs.map(Maps::newHashMapWithExpectedSize, AEKey.STREAM_CODEC, ByteBufCodecs.VAR_LONG);
+    private static final StreamCodec<RegistryFriendlyByteBuf, Map<AEKey, RecentInteractionInfo>> detailsCodec =
+            ByteBufCodecs.map(Maps::newHashMapWithExpectedSize, AEKey.STREAM_CODEC, infoCodec);
+
+    // written manually because StreamCodec.composite only supports up to 6 fields
+    public static final StreamCodec<RegistryFriendlyByteBuf, RecentAccessPayload> streamCodec = StreamCodec.of(
+            (buffer, payload) -> {
+                ByteBufCodecs.INT.encode(buffer, payload.containerId);
+                historyCodec.encode(buffer, payload.history);
+                detailsCodec.encode(buffer, payload.details);
+                buffer.writeBoolean(payload.historyPinEnabled);
+                ByteBufCodecs.INT.encode(buffer, payload.maxHistoryRows);
+                buffer.writeBoolean(payload.freezeReorderPulse);
+                buffer.writeBoolean(payload.hasLogger);
+                buffer.writeBoolean(payload.loggerConflict);
+            },
+            buffer -> new RecentAccessPayload(
+                    ByteBufCodecs.INT.decode(buffer),
+                    historyCodec.decode(buffer),
+                    detailsCodec.decode(buffer),
+                    buffer.readBoolean(),
+                    ByteBufCodecs.INT.decode(buffer),
+                    buffer.readBoolean(),
+                    buffer.readBoolean(),
+                    buffer.readBoolean()
+            )
     );
 
     @Override
@@ -64,6 +79,8 @@ public record RecentAccessPayload(
             ClientRecentAccessState.replaceDetails(payload.containerId, payload.details);
             ClientRecentAccessState.setRecentPinEnabled(payload.containerId, payload.historyPinEnabled);
             ClientRecentAccessState.setMaxHistoryRows(payload.containerId, payload.maxHistoryRows);
+            ClientRecentAccessState.setHasLogger(payload.containerId, payload.hasLogger);
+            ClientRecentAccessState.setLoggerConflict(payload.containerId, payload.loggerConflict);
             if (payload.freezeReorderPulse) {
                 ClientRecentAccessState.triggerHistoryReorderFreeze(payload.containerId);
             }

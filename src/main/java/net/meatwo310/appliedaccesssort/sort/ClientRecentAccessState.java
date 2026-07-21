@@ -20,6 +20,8 @@ public final class ClientRecentAccessState {
     private static final Map<Integer, Integer> maxHistoryRowsByContainer = new HashMap<>();
     private static final Map<Integer, Boolean> autoCraftPinnedRowByContainer = new HashMap<>();
     private static final Map<Integer, Boolean> historyReorderFrozenByContainer = new HashMap<>();
+    private static final Map<Integer, Boolean> hasLoggerByContainer = new HashMap<>();
+    private static final Map<Integer, Boolean> loggerConflictByContainer = new HashMap<>();
     private static final Set<Integer> dirtyContainers = new HashSet<>();
 
     public static void replaceHistory(int containerId, Map<AEKey, Long> history) {
@@ -47,6 +49,24 @@ public final class ClientRecentAccessState {
 
     public static boolean isRecentPinEnabled(int containerId) {
         return recentPinEnabledByContainer.getOrDefault(containerId, false);
+    }
+
+    public static void setHasLogger(int containerId, boolean hasLogger) {
+        hasLoggerByContainer.put(containerId, hasLogger);
+        dirtyContainers.add(containerId);
+    }
+
+    public static boolean hasLogger(int containerId) {
+        return hasLoggerByContainer.getOrDefault(containerId, false);
+    }
+
+    public static void setLoggerConflict(int containerId, boolean conflict) {
+        loggerConflictByContainer.put(containerId, conflict);
+        dirtyContainers.add(containerId);
+    }
+
+    public static boolean hasLoggerConflict(int containerId) {
+        return loggerConflictByContainer.getOrDefault(containerId, false);
     }
 
     public static void setPinnedRowCount(int containerId, int rowCount) {

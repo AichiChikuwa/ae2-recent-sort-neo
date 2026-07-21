@@ -4,6 +4,7 @@ import appeng.client.gui.Icon;
 import appeng.client.gui.style.Blitter;
 import appeng.client.gui.widgets.IconButton;
 import net.meatwo310.appliedaccesssort.Constants;
+import net.meatwo310.appliedaccesssort.sort.ClientRecentAccessState;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -13,8 +14,9 @@ import java.util.List;
 public class RecentPinToggleButton extends IconButton {
     private static final ResourceLocation historyToggleTexture = ResourceLocation.fromNamespaceAndPath(
             Constants.modId,
-            "history_toggle.png"
+            "textures/gui/history_toggle.png"
     );
+    private final int containerId;
     private boolean enabled;
     private final ToggleHandler onToggle;
 
@@ -23,10 +25,19 @@ public class RecentPinToggleButton extends IconButton {
         void onToggle(boolean enabled);
     }
 
-    public RecentPinToggleButton(boolean initialEnabled, ToggleHandler onToggle) {
+    public RecentPinToggleButton(int containerId, boolean initialEnabled, ToggleHandler onToggle) {
         super(btn -> ((RecentPinToggleButton) btn).toggle());
+        this.containerId = containerId;
         this.enabled = initialEnabled;
         this.onToggle = onToggle;
+    }
+
+    private boolean hasLogger() {
+        return ClientRecentAccessState.hasLogger(containerId);
+    }
+
+    private boolean hasConflict() {
+        return ClientRecentAccessState.hasLoggerConflict(containerId);
     }
 
     public boolean isEnabledState() {
@@ -38,6 +49,10 @@ public class RecentPinToggleButton extends IconButton {
     }
 
     private void toggle() {
+        // the toggle is inert until a single, active me logger exists in the network
+        if (!hasLogger()) {
+            return;
+        }
         this.enabled = !this.enabled;
         this.onToggle.onToggle(this.enabled);
     }
@@ -70,6 +85,16 @@ public class RecentPinToggleButton extends IconButton {
 
     @Override
     public List<Component> getTooltipMessage() {
+        if (hasConflict()) {
+            return List.of(
+                    Component.translatable("tooltip.appliedhistory.history"),
+                    Component.translatable("tooltip.appliedhistory.toggle.conflict"));
+        }
+        if (!hasLogger()) {
+            return List.of(
+                    Component.translatable("tooltip.appliedhistory.history"),
+                    Component.translatable("tooltip.appliedhistory.toggle.noLogger"));
+        }
         return List.of(
                 Component.translatable("tooltip.appliedhistory.history"),
                 Component.translatable(enabled

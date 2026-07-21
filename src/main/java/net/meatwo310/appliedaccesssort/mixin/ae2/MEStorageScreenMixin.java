@@ -31,7 +31,7 @@ public abstract class MEStorageScreenMixin {
     @Unique
     private static final ResourceLocation historyRowTexture = ResourceLocation.fromNamespaceAndPath(
             Constants.modId,
-            "history_row.png"
+            "textures/gui/history_row.png"
     );
     @Shadow
     @Final
@@ -58,7 +58,7 @@ public abstract class MEStorageScreenMixin {
         var buttons = ((VerticalButtonBarAccessor) toolbar).getButtons();
         var containerId = menu.containerId;
         var initialEnabled = ClientRecentAccessState.isRecentPinEnabled(containerId);
-        var button = new RecentPinToggleButton(initialEnabled, enabled -> {
+        var button = new RecentPinToggleButton(containerId, initialEnabled, enabled -> {
             ClientRecentAccessState.setRecentPinEnabled(containerId, enabled);
             PacketDistributor.sendToServer(new RecentPinTogglePayload(containerId, enabled));
             repo.updateView();

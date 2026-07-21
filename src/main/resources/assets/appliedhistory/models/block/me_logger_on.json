@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "appliedhistory:block/me_logger_front",
+    "north": "appliedhistory:block/me_logger_front",
+    "south": "appliedhistory:block/me_logger_back",
+    "east": "appliedhistory:block/me_logger_side",
+    "west": "appliedhistory:block/me_logger_side",
+    "up": "appliedhistory:block/me_logger_top_on",
+    "down": "appliedhistory:block/me_logger_bottom"
+  }
+}

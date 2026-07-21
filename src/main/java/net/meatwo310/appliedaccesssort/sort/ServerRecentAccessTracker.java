@@ -1,130 +1,173 @@
 package net.meatwo310.appliedaccesssort.sort;
 
+import appeng.api.networking.IGrid;
 import appeng.api.networking.IGridNode;
 import appeng.api.stacks.AEKey;
-import appeng.parts.AEBasePart;
+import net.meatwo310.appliedaccesssort.block.MELoggerBlockEntity;
 import net.meatwo310.appliedaccesssort.config.ServerConfig;
-import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 public final class ServerRecentAccessTracker {
     private ServerRecentAccessTracker() {
     }
-    private static final HashMap<String, HashMap<AEKey, Long>> historyByNodeKey = new HashMap<>();
-    private static final HashMap<String, HashMap<AEKey, RecentInteractionInfo>> detailsByNodeKey = new HashMap<>();
-    private static final HashMap<String, Long> sequenceByNodeKey = new HashMap<>();
-    private static final HashMap<String, Boolean> historyPinEnabledByNodeKey = new HashMap<>();
-    private static final HashMap<String, Boolean> loadedByNodeKey = new HashMap<>();
+
+    // history is keyed by the logger block's stable uuid, not by the volatile grid topology
+    private static final HashMap<String, HashMap<AEKey, Long>> historyByKey = new HashMap<>();
+    private static final HashMap<String, HashMap<AEKey, RecentInteractionInfo>> detailsByKey = new HashMap<>();
+    private static final HashMap<String, Long> sequenceByKey = new HashMap<>();
+    private static final HashMap<String, Boolean> historyPinEnabledByKey = new HashMap<>();
+    private static final HashSet<String> loadedKeys = new HashSet<>();
+
+    private record Target(ServerLevel level, String key) {
+    }
 
     public static void markInteraction(IGridNode gridNode, AEKey key, String playerName, RecentInteractionAction action) {
-        var nodeKey = getNodeKey(gridNode);
-        if (nodeKey == null) {
+        var target = target(gridNode);
+        if (target == null) {
             return;
         }
-        ensureLoaded(gridNode, nodeKey);
-        long nextSequence = sequenceByNodeKey.getOrDefault(nodeKey, 0L) + 1L;
-        sequenceByNodeKey.put(nodeKey, nextSequence);
-        historyByNodeKey.computeIfAbsent(nodeKey, ignored -> new HashMap<>()).put(key, nextSequence);
-        detailsByNodeKey.computeIfAbsent(nodeKey, ignored -> new HashMap<>()).put(
+        ensureLoaded(target);
+        long nextSequence = sequenceByKey.getOrDefault(target.key, 0L) + 1L;
+        sequenceByKey.put(target.key, nextSequence);
+        historyByKey.computeIfAbsent(target.key, ignored -> new HashMap<>()).put(key, nextSequence);
+        detailsByKey.computeIfAbsent(target.key, ignored -> new HashMap<>()).put(
                 key,
                 new RecentInteractionInfo(nextSequence, System.currentTimeMillis(), playerName, action)
         );
-        pruneOldest(nodeKey);
-        persist(gridNode, nodeKey);
+        pruneOldest(target.key);
+        persist(target);
     }
 
     public static HashMap<AEKey, Long> snapshotHistory(IGridNode gridNode) {
-        var nodeKey = getNodeKey(gridNode);
-        if (nodeKey == null) {
+        var target = target(gridNode);
+        if (target == null) {
             return new HashMap<>();
         }
-        ensureLoaded(gridNode, nodeKey);
-        if (pruneOldest(nodeKey)) {
-            persist(gridNode, nodeKey);
+        ensureLoaded(target);
+        if (pruneOldest(target.key)) {
+            persist(target);
         }
-        var history = historyByNodeKey.get(nodeKey);
+        var history = historyByKey.get(target.key);
         return history == null ? new HashMap<>() : new HashMap<>(history);
     }
 
     public static HashMap<AEKey, RecentInteractionInfo> snapshotDetails(IGridNode gridNode) {
-        var nodeKey = getNodeKey(gridNode);
-        if (nodeKey == null) {
+        var target = target(gridNode);
+        if (target == null) {
             return new HashMap<>();
         }
-        ensureLoaded(gridNode, nodeKey);
-        if (pruneOldest(nodeKey)) {
-            persist(gridNode, nodeKey);
+        ensureLoaded(target);
+        if (pruneOldest(target.key)) {
+            persist(target);
         }
-        var details = detailsByNodeKey.get(nodeKey);
+        var details = detailsByKey.get(target.key);
         return details == null ? new HashMap<>() : new HashMap<>(details);
     }
 
     public static boolean isHistoryPinEnabled(IGridNode gridNode) {
-        var nodeKey = getNodeKey(gridNode);
-        if (nodeKey == null) {
+        var target = target(gridNode);
+        if (target == null) {
             return false;
         }
-        ensureLoaded(gridNode, nodeKey);
-        if (pruneOldest(nodeKey)) {
-            persist(gridNode, nodeKey);
+        ensureLoaded(target);
+        if (pruneOldest(target.key)) {
+            persist(target);
         }
-        return historyPinEnabledByNodeKey.getOrDefault(nodeKey, false);
+        return historyPinEnabledByKey.getOrDefault(target.key, false);
     }
 
     public static void setHistoryPinEnabled(IGridNode gridNode, boolean enabled) {
-        var nodeKey = getNodeKey(gridNode);
-        if (nodeKey == null) {
+        var target = target(gridNode);
+        if (target == null) {
             return;
         }
-        ensureLoaded(gridNode, nodeKey);
-        historyPinEnabledByNodeKey.put(nodeKey, enabled);
-        persist(gridNode, nodeKey);
+        ensureLoaded(target);
+        historyPinEnabledByKey.put(target.key, enabled);
+        persist(target);
     }
 
-    private static void ensureLoaded(IGridNode gridNode, String nodeKey) {
-        if (loadedByNodeKey.getOrDefault(nodeKey, false)) {
-            return;
-        }
-        var serverLevel = getServerLevel(gridNode);
-        if (serverLevel == null) {
-            historyByNodeKey.put(nodeKey, new HashMap<>());
-            detailsByNodeKey.put(nodeKey, new HashMap<>());
-            sequenceByNodeKey.put(nodeKey, 0L);
-            historyPinEnabledByNodeKey.put(nodeKey, false);
-            loadedByNodeKey.put(nodeKey, true);
-            return;
-        }
+    // true only when a single, active me logger owns the terminal's network
+    public static boolean hasLogger(IGridNode gridNode) {
+        return resolveLogger(gridNode) != null;
+    }
 
-        var data = RecentAccessSavedData.get(serverLevel);
-        var loadedDetails = data.getDetails(nodeKey);
+    // true when the terminal's network holds more than one me logger
+    public static boolean hasConflict(IGridNode gridNode) {
+        if (gridNode == null) {
+            return false;
+        }
+        var grid = gridNode.getGrid();
+        if (grid == null) {
+            return false;
+        }
+        return countLoggers(grid) > 1;
+    }
+
+    // number of remembered entries stored for a specific logger, used by the logger gui
+    public static int getEntryCount(MELoggerBlockEntity logger) {
+        if (logger == null || logger.getHistoryId() == null) {
+            return 0;
+        }
+        if (!(logger.getLevel() instanceof ServerLevel level)) {
+            return 0;
+        }
+        var target = new Target(level, logger.getHistoryId().toString());
+        ensureLoaded(target);
+        var details = detailsByKey.get(target.key);
+        return details == null ? 0 : details.size();
+    }
+
+    public static int maxRememberedItems() {
+        return maxHistoryRows() * 9 + 27;
+    }
+
+    // erases everything stored for this logger's uuid, both in memory and on disk
+    public static void purge(MELoggerBlockEntity logger) {
+        if (logger == null || logger.getHistoryId() == null) {
+            return;
+        }
+        if (!(logger.getLevel() instanceof ServerLevel level)) {
+            return;
+        }
+        var key = logger.getHistoryId().toString();
+        historyByKey.remove(key);
+        detailsByKey.remove(key);
+        sequenceByKey.remove(key);
+        historyPinEnabledByKey.remove(key);
+        loadedKeys.remove(key);
+        RecentAccessSavedData.get(level).remove(key);
+    }
+
+    private static void ensureLoaded(Target target) {
+        if (loadedKeys.contains(target.key)) {
+            return;
+        }
+        var data = RecentAccessSavedData.get(target.level);
+        var loadedDetails = data.getDetails(target.key);
         var loadedHistory = new HashMap<AEKey, Long>();
         for (var entry : loadedDetails.entrySet()) {
             loadedHistory.put(entry.getKey(), entry.getValue().sequence());
         }
 
-        historyByNodeKey.put(nodeKey, loadedHistory);
-        detailsByNodeKey.put(nodeKey, loadedDetails);
-        sequenceByNodeKey.put(nodeKey, Math.max(data.getSequence(nodeKey), maxSequence(loadedDetails)));
-        historyPinEnabledByNodeKey.put(nodeKey, data.isHistoryPinEnabled(nodeKey));
-        loadedByNodeKey.put(nodeKey, true);
+        historyByKey.put(target.key, loadedHistory);
+        detailsByKey.put(target.key, loadedDetails);
+        sequenceByKey.put(target.key, Math.max(data.getSequence(target.key), maxSequence(loadedDetails)));
+        historyPinEnabledByKey.put(target.key, data.isHistoryPinEnabled(target.key));
+        loadedKeys.add(target.key);
     }
 
-    private static void persist(IGridNode gridNode, String nodeKey) {
-        var serverLevel = getServerLevel(gridNode);
-        if (serverLevel == null) {
-            return;
-        }
-        var data = RecentAccessSavedData.get(serverLevel);
+    private static void persist(Target target) {
+        var data = RecentAccessSavedData.get(target.level);
         data.put(
-                nodeKey,
-                sequenceByNodeKey.getOrDefault(nodeKey, 0L),
-                detailsByNodeKey.getOrDefault(nodeKey, new HashMap<>())
+                target.key,
+                sequenceByKey.getOrDefault(target.key, 0L),
+                detailsByKey.getOrDefault(target.key, new HashMap<>())
         );
-        data.putHistoryPinEnabled(nodeKey, historyPinEnabledByNodeKey.getOrDefault(nodeKey, false));
+        data.putHistoryPinEnabled(target.key, historyPinEnabledByKey.getOrDefault(target.key, false));
     }
 
     private static long maxSequence(Map<AEKey, RecentInteractionInfo> details) {
@@ -139,13 +182,9 @@ public final class ServerRecentAccessTracker {
         return Math.max(1, ServerConfig.historyRows.get());
     }
 
-    private static int maxRememberedItems() {
-        return maxHistoryRows() * 9 + 27;
-    }
-
-    private static boolean pruneOldest(String nodeKey) {
-        var details = detailsByNodeKey.get(nodeKey);
-        var history = historyByNodeKey.get(nodeKey);
+    private static boolean pruneOldest(String key) {
+        var details = detailsByKey.get(key);
+        var history = historyByKey.get(key);
         if (details == null || history == null) {
             return false;
         }
@@ -170,48 +209,75 @@ public final class ServerRecentAccessTracker {
         return changed;
     }
 
-    private static ServerLevel getServerLevel(IGridNode gridNode) {
-        return gridNode.getLevel();
-    }
-
-    private static String getNodeKey(IGridNode node) {
-        var level = node.getLevel();
-        if (level == null) {
+    private static Target target(IGridNode gridNode) {
+        var logger = resolveLogger(gridNode);
+        if (logger == null || logger.getHistoryId() == null) {
             return null;
         }
+        if (!(logger.getLevel() instanceof ServerLevel level)) {
+            return null;
+        }
+        return new Target(level, logger.getHistoryId().toString());
+    }
 
-        // Scope history to AE2 network identity, not terminal host.
-        // Using the pivot node owner makes all terminals in the same grid share history.
+    // true when this logger shares its network with at least one other logger
+    public static boolean isLoggerConflicted(MELoggerBlockEntity logger) {
+        if (logger == null) {
+            return false;
+        }
+        var node = logger.getGridNode();
+        if (node == null) {
+            return false;
+        }
         var grid = node.getGrid();
-        var pivot = grid == null ? null : grid.getPivot();
-        if (pivot != null) {
-            var ownerKey = ownerKey(pivot.getOwner());
-            if (ownerKey != null) {
-                return level.dimension().location() + "|grid|" + ownerKey;
-            }
+        if (grid == null) {
+            return false;
         }
-
-        // Fallback should be rare, but keeps behavior stable if pivot/owner is unavailable.
-        var fallbackOwnerKey = ownerKey(node.getOwner());
-        return fallbackOwnerKey == null ? null : level.dimension().location() + "|grid-fallback|" + fallbackOwnerKey;
+        return countLoggers(grid) > 1;
     }
 
-    private static String ownerKey(Object owner) {
-        if (owner == null) {
+    // find the single, active logger that owns history for this network.
+    // more than one logger is treated as a conflict: history behaves as if none exists.
+    private static MELoggerBlockEntity resolveLogger(IGridNode gridNode) {
+        if (gridNode == null) {
             return null;
         }
-        if (owner instanceof BlockEntity blockEntity) {
-            return "be|" + blockEntity.getBlockPos().asLong();
+        var grid = gridNode.getGrid();
+        if (grid == null) {
+            return null;
         }
-        if (owner instanceof AEBasePart part && part.getBlockEntity() != null) {
-            Direction side = part.getSide();
-            if (side != null) {
-                return "part|" + part.getBlockEntity().getBlockPos().asLong() + "|" + side.getName();
+        MELoggerBlockEntity only = null;
+        int count = 0;
+        for (var logger : grid.getMachines(MELoggerBlockEntity.class)) {
+            if (logger.getHistoryId() == null) {
+                continue;
             }
-            // side can be unset while the network is rewiring; use identity when facing is unavailable
-            return "part|" + part.getBlockEntity().getBlockPos().asLong() + "|noside|" + System.identityHashCode(part);
+            if (!(logger.getLevel() instanceof ServerLevel)) {
+                continue;
+            }
+            only = logger;
+            count++;
+            if (count > 1) {
+                return null;
+            }
         }
-        return "owner|" + owner.getClass().getName() + "|" + System.identityHashCode(owner);
+        if (count != 1) {
+            return null;
+        }
+        // the logger needs power and a channel to actually record history
+        if (!only.getMainNode().isActive()) {
+            return null;
+        }
+        return only;
+    }
+
+    private static int countLoggers(IGrid grid) {
+        int count = 0;
+        for (var logger : grid.getMachines(MELoggerBlockEntity.class)) {
+            if (logger.getHistoryId() != null && logger.getLevel() instanceof ServerLevel) {
+                count++;
+            }
+        }
+        return count;
     }
 }
-
