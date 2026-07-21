@@ -1,3 +1,6 @@
 {
-  "parent": "appliedhistory:block/me_logger_off"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "ae2:block/quartz_cluster"
+  }
 }

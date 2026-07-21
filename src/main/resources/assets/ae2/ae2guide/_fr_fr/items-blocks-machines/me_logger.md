@@ -1,60 +1,110 @@
 ---
 navigation:
   parent: items-blocks-machines/items-blocks-machines-index.md
-  title: Enregistreur ME
+  title: ME Logger
   icon: appliedhistory:me_logger
   position: 215
 categories:
 - devices
 item_ids:
 - appliedhistory:me_logger
+- appliedhistory:dormant_me_logger
 ---
 
-# L'Enregistreur ME
+# The ME Logger
 
-<BlockImage id="appliedhistory:me_logger" scale="8" />
 
-L'Enregistreur ME est le bloc auquel appartient l'historique des interactions d'un réseau. Tant qu'il est
-présent, le réseau se souvient des objets récemment importés, exportés ou demandés via ses terminaux, ce qui
-alimente les lignes d'historique et l'épinglage dans le Terminal ME.
 
-## Fonctionnement
 
-*   Il enregistre les interactions récentes avec les objets de son réseau et conserve l'historique dans
-    l'ordre.
-*   L'historique est lié à l'enregistreur lui-même, et non à la forme du réseau. Chaque enregistreur possède
-    un identifiant unique, conservé dans l'objet-bloc lorsqu'il est cassé. Retirer l'enregistreur puis le
-    reposer préserve donc son historique.
-*   Le bouton d'historique des Terminaux ME ne fonctionne que si un seul Enregistreur ME actif est présent
-    sur le réseau. Sans lui, le bouton est inactif et indique qu'un enregistreur est nécessaire.
-*   Le nombre d'entrées mémorisées est limité par la configuration du mod (le même réglage que pour les lignes
-    d'historique).
 
-## Énergie et canaux
 
-L'Enregistreur ME utilise toujours un canal et consomme de l'énergie pour fonctionner (par défaut 10 AE par
-tick, configurable). S'il perd son énergie ou un canal, il cesse d'enregistrer. Sa face supérieure indique son
-état actuel :
 
-*   **Éteint** – pas d'énergie ou pas de canal ; l'enregistreur n'enregistre pas.
-*   **Allumé** – alimenté et enregistrant en tant que seul enregistreur du réseau.
-*   **Erreur** – plus d'un enregistreur est présent sur le réseau.
 
-## Conflits
 
-Il ne doit y avoir qu'un seul Enregistreur ME par réseau à la fois. Si deux ou plus sont connectés, ils
-entrent en conflit : l'historique se comporte comme s'il n'y avait aucun enregistreur, le bouton du terminal
-affiche un message de conflit dédié, et chaque enregistreur en conflit affiche l'état d'erreur jusqu'à ce
-qu'il n'en reste qu'un.
+<GameScene zoom="5" background="transparent">
+  <Block id="appliedhistory:me_logger" y="0" p:facing="north" p:status="on" />
+  <Block id="appliedhistory:me_logger_bounding" y="1" />
+  <Block id="appliedhistory:me_logger_bounding" y="2" />
+</GameScene>
 
-## Interface et purge
+The ME Logger owns a network's interaction history. While it is present and active, the network remembers
+items that were recently imported, exported, or requested through its terminals. That history powers the
+history rows and pinning in the ME Terminal.
 
-Un clic droit sur l'Enregistreur ME ouvre un petit écran indiquant le nombre d'entrées actuellement stockées
-et le maximum configuré. Il comporte aussi un bouton **Purger l'historique** avec une confirmation en deux
-temps : le premier clic affiche un avertissement, et un second clic dans les cinq secondes supprime
-définitivement l'historique stocké de cet enregistreur et retire le bloc, laissant tomber un enregistreur
-vierge sans identifiant stocké.
+The placeable logger is a **1×1×3 vertical multiblock**. Crafting does not give a ready logger directly.
 
-## Recette
+## Dormant ME Logger
 
-<RecipeFor id="appliedhistory:me_logger" />
+Crafting produces a <ItemLink id="appliedhistory:dormant_me_logger" />. Hold it in the main hand and perform
+this sequence:
+
+1. crouch
+2. crouch
+3. left-click
+4. left-click
+5. crouch
+
+A progress bar on the item shows how far along the ritual is. Wrong inputs reset progress. Leaving the
+sequence idle for too long also rolls progress back. Completing it awakens the item into an ME Logger that
+already carries a unique history identity and is ready to place.
+
+There is also a harder crafting variant that uses froglights instead of the clock and books. A dormant logger
+from that recipe (and anything awakened or purged from it) shows a special tooltip: that it was obtained the
+lunatic way. Functionally it behaves the same.
+
+## What It Does
+
+*   It records recent item interactions on its network and keeps the ordered history.
+*   History is tied to the logger's identity, not to the shape of the network. That identity lives on the
+    block item when the logger is broken, so removing and replacing it keeps the history intact.
+*   The history toggle in ME Terminals only works while a single, active ME Logger is on the network.
+*   The number of remembered entries is limited by the mod's config (the same setting used for the history
+    rows).
+
+## Blank Loggers
+
+An ME Logger without an identity (for example from `/give`) is **blank**. Blank loggers always show the
+error state, cannot record history, and tell the player in their GUI to use **Purge History** to recover a
+Dormant ME Logger. Only awakened loggers are meant to be placed for real use.
+
+## Power and Channels
+
+The ME Logger always uses one channel and draws power to run (by default 10 AE per tick, configurable). If it
+loses power or a channel it stops logging. AE cables can connect to every face of the **bottom** segment,
+including underneath.
+
+Status shown on the logger:
+
+*   **Off** – no power or no channel; not recording.
+*   **On** – powered and recording as the sole logger of the network.
+*   **Error** – more than one logger is on the network, or this logger is blank.
+
+## Multiblock Integrity
+
+Every five seconds the logger checks that its three vertical segments are still present and correctly linked
+to the bottom block. If anything is missing or misaligned, it runs the purge sequence (history wipe,
+structure removal, dormant drop) and summons a lightning strike at its **current** position. Moving the whole
+structure is fine as long as the three blocks stay together.
+
+## Conflicts
+
+Only one ME Logger should be on a network at a time. If two or more are connected, they conflict: history
+behaves as if there were no logger, the terminal toggle shows a conflict message, and every conflicting
+logger shows the error state until only one remains.
+
+## GUI and Purging
+
+Right-clicking the ME Logger opens a small screen with the current entry count and the configured maximum.
+**Purge History** uses a two-step confirmation: the first click shows a warning, and a second click within
+five seconds permanently deletes this logger's stored history, removes the multiblock, and drops a Dormant
+ME Logger.
+
+## Recipes
+
+Craft a Dormant ME Logger, then awaken it:
+
+<Recipe id="appliedhistory:dormant_me_logger" />
+
+Harder froglight variant:
+
+<Recipe id="appliedhistory:dormant_me_logger_lunatic" />

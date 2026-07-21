@@ -1,0 +1,28 @@
+{
+  "display": {
+    "icon": {
+      "id": "appliedhistory:me_logger"
+    },
+    "title": {
+      "translate": "advancements.appliedhistory.root.title"
+    },
+    "description": {
+      "translate": "advancements.appliedhistory.root.description"
+    },
+    "background": "ae2:textures/block/fluix_block.png",
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "tick": {
+      "trigger": "minecraft:tick"
+    }
+  },
+  "requirements": [
+    [
+      "tick"
+    ]
+  ]
+}

@@ -22,5 +22,12 @@
   "tooltip.appliedhistory.age.hour": "%s小时",
   "tooltip.appliedhistory.age.hours": "%s小时",
   "tooltip.appliedhistory.age.day": "%s天",
-  "tooltip.appliedhistory.age.days": "%s天"
+  "tooltip.appliedhistory.age.days": "%s天",
+  "itemGroup.appliedhistory": "Applied History",
+  "advancements.appliedhistory.root.title": "Applied History",
+  "advancements.appliedhistory.root.description": "Track ME network interaction history.",
+  "advancements.appliedhistory.obtain_me_logger.title": "logger adv placeholder",
+  "advancements.appliedhistory.obtain_me_logger.description": "logger adv desc",
+  "advancements.appliedhistory.obtain_lunatic_dormant.title": "lunatic adv placeholder",
+  "advancements.appliedhistory.obtain_lunatic_dormant.description": "lunatic adv desc"
 }

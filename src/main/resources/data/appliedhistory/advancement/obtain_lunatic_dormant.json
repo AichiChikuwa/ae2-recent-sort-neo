@@ -1,0 +1,46 @@
+{
+  "parent": "appliedhistory:root",
+  "display": {
+    "icon": {
+      "id": "appliedhistory:dormant_me_logger",
+      "components": {
+        "appliedhistory:lunatic_origin": true
+      }
+    },
+    "title": {
+      "translate": "advancements.appliedhistory.obtain_lunatic_dormant.title"
+    },
+    "description": {
+      "translate": "advancements.appliedhistory.obtain_lunatic_dormant.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "criteria": {
+    "has_lunatic_dormant": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "appliedhistory:dormant_me_logger",
+            "components": {
+              "appliedhistory:lunatic_origin": true
+            }
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_lunatic_dormant"
+    ]
+  ],
+  "rewards": {
+    "loot": [
+      "appliedhistory:lunatic_head"
+    ]
+  }
+}
