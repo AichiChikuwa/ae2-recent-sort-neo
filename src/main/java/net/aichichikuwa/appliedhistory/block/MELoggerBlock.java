@@ -3,10 +3,16 @@ package net.aichichikuwa.appliedhistory.block;
 import appeng.api.orientation.IOrientationStrategy;
 import appeng.api.orientation.OrientationStrategies;
 import appeng.block.AEBaseEntityBlock;
+import appeng.client.render.effects.ParticleTypes;
+import appeng.core.AEConfig;
+import appeng.core.AppEngClient;
 import appeng.menu.MenuOpener;
 import appeng.menu.locator.MenuLocators;
 import net.aichichikuwa.appliedhistory.AHRegistry;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -17,10 +23,14 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
@@ -123,5 +133,66 @@ public class MELoggerBlock extends AEBaseEntityBlock<MELoggerBlockEntity> {
             MELoggerMultiblock.removeBoundingBlocks(level, pos);
         }
         super.onRemove(state, level, pos, newState, movedByPiston);
+    }
+
+    // plates in model pixels (north-facing authoring space); ber elevates by +16 so they sit in the bottom cell
+    private static final float[] PLATE_A = {6.5f, -10f, 1f, 7.5f, -3f, 6f};
+    private static final float[] PLATE_B = {8.5f, -10f, 1f, 9.5f, -3f, 6f};
+
+    // same vibrant motes as ae2 quartz vibrant glass; only while the logger is actively working
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (state.getValue(STATUS) != MELoggerStatus.ON) {
+            return;
+        }
+        if (!AEConfig.instance().isEnableEffects()) {
+            return;
+        }
+        if (!AppEngClient.instance().shouldAddParticles(random)) {
+            return;
+        }
+        Direction facing = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
+        spawnPlateParticle(level, pos, facing, random, PLATE_A);
+        spawnPlateParticle(level, pos, facing, random, PLATE_B);
+    }
+
+    private static void spawnPlateParticle(Level level, BlockPos pos, Direction facing, RandomSource random,
+            float[] plate) {
+        float mx = Mth.lerp(random.nextFloat(), plate[0], plate[3]);
+        float my = Mth.lerp(random.nextFloat(), plate[1], plate[4]);
+        float mz = Mth.lerp(random.nextFloat(), plate[2], plate[5]);
+        var world = modelPointToWorld(pos, facing, mx, my, mz);
+        level.addParticle(ParticleTypes.VIBRANT, world.x, world.y, world.z, 0.0D, 0.0D, 0.0D);
+    }
+
+    // model coords are authored for facing=north; blockstate y-rotates the mesh the same way
+    private static Vec3 modelPointToWorld(BlockPos pos, Direction facing, float modelX, float modelY, float modelZ) {
+        double lx = modelX / 16.0;
+        double ly = (modelY + 16.0) / 16.0;
+        double lz = modelZ / 16.0;
+        double rx = lx - 0.5;
+        double rz = lz - 0.5;
+        double nx;
+        double nz;
+        switch (facing) {
+            case EAST -> {
+                nx = -rz;
+                nz = rx;
+            }
+            case SOUTH -> {
+                nx = -rx;
+                nz = -rz;
+            }
+            case WEST -> {
+                nx = rz;
+                nz = -rx;
+            }
+            default -> {
+                nx = rx;
+                nz = rz;
+            }
+        }
+        return new Vec3(pos.getX() + nx + 0.5, pos.getY() + ly, pos.getZ() + nz + 0.5);
     }
 }

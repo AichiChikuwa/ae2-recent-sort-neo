@@ -8,7 +8,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.aichichikuwa.appliedhistory.block.MELoggerBlock;
 import net.aichichikuwa.appliedhistory.block.MELoggerBlockEntity;
+import net.aichichikuwa.appliedhistory.block.MELoggerMultiblock;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
@@ -17,11 +19,13 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.model.data.ModelData;
 
 import java.util.EnumSet;
 import java.util.Locale;
@@ -47,27 +51,42 @@ public class MELoggerBlockEntityRenderer implements BlockEntityRenderer<MELogger
 
         BlockState renderState = blockEntity.getBlockState().setValue(MELoggerBlock.STATUS, blockEntity.getStatus());
         var model = blockRenderer.getBlockModelShaper().getBlockModel(renderState);
-        var buffer = buffers.getBuffer(RenderType.solid());
+        // cutout respects the atlas alpha; solid would paint transparent texels opaque (black)
+        var buffer = buffers.getBuffer(RenderType.cutout());
+        // flat light across the tall mesh: tesselate* samples face-adjacent light at the be pos,
+        // so a solid neighbor of the bottom block would darken the whole side including the visual top
+        int structureLight = structurePackedLight(level, blockEntity.getBlockPos());
 
         poseStack.pushPose();
         poseStack.translate(0, MODEL_Y_OFFSET, 0);
-
-        blockRenderer.getModelRenderer().tesselateWithAO(
-                level,
-                model,
-                renderState,
-                blockEntity.getBlockPos(),
-                poseStack,
+        blockRenderer.getModelRenderer().renderModel(
+                poseStack.last(),
                 buffer,
-                false,
-                RandomSource.create(),
-                renderState.getSeed(blockEntity.getBlockPos()),
-                packedOverlay);
+                renderState,
+                model,
+                1.0f,
+                1.0f,
+                1.0f,
+                structureLight,
+                packedOverlay,
+                ModelData.EMPTY,
+                RenderType.cutout());
         poseStack.popPose();
 
         if (level.getBlockEntity(blockEntity.getBlockPos().below()) instanceof CableBusBlockEntity cableBus) {
-            renderUnderCableStub(cableBus.getCableBus().getColor(), poseStack, buffers, packedLight);
+            renderUnderCableStub(cableBus.getCableBus().getColor(), poseStack, buffers, structureLight);
         }
+    }
+
+    private static int structurePackedLight(BlockAndTintGetter level, BlockPos mainPos) {
+        int block = 0;
+        int sky = 0;
+        for (int segment = 0; segment < MELoggerMultiblock.HEIGHT; segment++) {
+            int light = net.minecraft.client.renderer.LevelRenderer.getLightColor(level, mainPos.above(segment));
+            block = Math.max(block, LightTexture.block(light));
+            sky = Math.max(sky, LightTexture.sky(light));
+        }
+        return LightTexture.pack(block, sky);
     }
 
     private void renderUnderCableStub(AEColor color, PoseStack poseStack, MultiBufferSource buffers, int packedLight) {

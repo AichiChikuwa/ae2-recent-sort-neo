@@ -1,18 +1,18 @@
 {
   "variants": {
-    "facing=north,status=off": { "model": "appliedhistory:block/me_logger_off" },
-    "facing=east,status=off": { "model": "appliedhistory:block/me_logger_off", "y": 90 },
-    "facing=south,status=off": { "model": "appliedhistory:block/me_logger_off", "y": 180 },
-    "facing=west,status=off": { "model": "appliedhistory:block/me_logger_off", "y": 270 },
+    "facing=north,status=off": { "model": "appliedhistory:block/me_logger" },
+    "facing=east,status=off": { "model": "appliedhistory:block/me_logger", "y": 90 },
+    "facing=south,status=off": { "model": "appliedhistory:block/me_logger", "y": 180 },
+    "facing=west,status=off": { "model": "appliedhistory:block/me_logger", "y": 270 },
 
-    "facing=north,status=on": { "model": "appliedhistory:block/me_logger_on" },
-    "facing=east,status=on": { "model": "appliedhistory:block/me_logger_on", "y": 90 },
-    "facing=south,status=on": { "model": "appliedhistory:block/me_logger_on", "y": 180 },
-    "facing=west,status=on": { "model": "appliedhistory:block/me_logger_on", "y": 270 },
+    "facing=north,status=on": { "model": "appliedhistory:block/me_logger" },
+    "facing=east,status=on": { "model": "appliedhistory:block/me_logger", "y": 90 },
+    "facing=south,status=on": { "model": "appliedhistory:block/me_logger", "y": 180 },
+    "facing=west,status=on": { "model": "appliedhistory:block/me_logger", "y": 270 },
 
-    "facing=north,status=error": { "model": "appliedhistory:block/me_logger_error" },
-    "facing=east,status=error": { "model": "appliedhistory:block/me_logger_error", "y": 90 },
-    "facing=south,status=error": { "model": "appliedhistory:block/me_logger_error", "y": 180 },
-    "facing=west,status=error": { "model": "appliedhistory:block/me_logger_error", "y": 270 }
+    "facing=north,status=error": { "model": "appliedhistory:block/me_logger" },
+    "facing=east,status=error": { "model": "appliedhistory:block/me_logger", "y": 90 },
+    "facing=south,status=error": { "model": "appliedhistory:block/me_logger", "y": 180 },
+    "facing=west,status=error": { "model": "appliedhistory:block/me_logger", "y": 270 }
   }
 }

@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.0.0] - 2026-07-25
+
+First full release of Applied History!
+
+### ME Logger
+- ME Logger is now a 1×1×3 multiblock with some new mechanics. It's no longer craftable, players now instead need to craft a-
+
+### Dormant ME Logger
+- craftable blank / dormant logger item that does nothing on its own
+- activate it to turn it into a working ME Logger
+
+### Misc.
+- GuideME entry for the ME Logger and the Dormant ME Logger
+- creative tab, commands, and localization updates
+
 ## [0.2.0] - 2026-07-21
 
 This update reworks how history works from the ground up. Players now require an **ME Logger** block to record and use.
