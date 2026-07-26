@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.1] - 2026-07-27
+
+- Small translation updates
+- Git refactoring is also done on this update
+
 ## [1.0.0] - 2026-07-25
 
 First full release of Applied History!
