@@ -1,17 +1,50 @@
 {
-  "tooltip.appliedhistory.history": "履歴",
-  "tooltip.appliedhistory.toggle.enabled": "有効",
-  "tooltip.appliedhistory.toggle.disabled": "無効",
-  "tooltip.appliedhistory.history.detail": "%2$s が %3$s前に %1$s。",
-  "tooltip.appliedhistory.action.imported": "インポートしました",
-  "tooltip.appliedhistory.action.exported": "エクスポートしました",
-  "tooltip.appliedhistory.action.requested": "要求しました",
-  "tooltip.appliedhistory.age.second": "%s秒",
-  "tooltip.appliedhistory.age.seconds": "%s秒",
-  "tooltip.appliedhistory.age.minute": "%s分",
-  "tooltip.appliedhistory.age.minutes": "%s分",
-  "tooltip.appliedhistory.age.hour": "%s時間",
-  "tooltip.appliedhistory.age.hours": "%s時間",
-  "tooltip.appliedhistory.age.day": "%s日",
-  "tooltip.appliedhistory.age.days": "%s日"
+"tooltip.appliedhistory.history": "履歴",
+"tooltip.appliedhistory.toggle.enabled": "有効",
+"tooltip.appliedhistory.toggle.disabled": "無効",
+"tooltip.appliedhistory.toggle.noLogger": "このネットワークにはMEロガーが必要です。",
+"tooltip.appliedhistory.toggle.conflict": "無効：このネットワーク上に複数のMEロガーがあります。",
+
+"block.appliedhistory.me_logger": "MEロガー",
+"item.appliedhistory.dormant_me_logger": "休眠中のMEロガー",
+
+"tooltip.appliedhistory.dormant_me_logger.instructions": "メインハンドに持ち、スニーク、スニーク、左クリック、左クリック、スニークの順に操作してください。",
+"tooltip.appliedhistory.me_logger.ready": "準備完了",
+"tooltip.appliedhistory.me_logger.invalid": "このロガーは初期化されていないため、履歴を記録できません。",
+"tooltip.appliedhistory.me_logger.obtain_dormant": "休眠中のMEロガーを目覚めさせることで入手できます。",
+"tooltip.appliedhistory.lunatic_origin": "LUNATICの苦労したのに、追加機能は何もありません。",
+
+"itemGroup.appliedhistory": "Applied History",
+
+"advancements.appliedhistory.root.title": "Applied History",
+"advancements.appliedhistory.root.description": "MEネットワークの歴史を追跡しよう！ケロ。",
+
+"advancements.appliedhistory.obtain_me_logger.title": "二拝二拍一拝",
+"advancements.appliedhistory.obtain_me_logger.description": "初めてMEロガーをゲットする。",
+
+"advancements.appliedhistory.obtain_lunatic_dormant.title": "ケロちゃん風雨に負けず",
+"advancements.appliedhistory.obtain_lunatic_dormant.description": "あらゆる困難を乗り越え、わざわざありえないほど面倒な方法で休眠中のMEロガーをゲットする。まさにLUNATIC！",
+
+"gui.appliedhistory.me_logger.blank": "このロガーは未初期化のため、履歴を記録できません。「履歴を消去」を実行すると、設置可能な休眠中のMEロガーとして回収できます。",
+"gui.appliedhistory.me_logger.entries": "記録済みエントリ：%s / %s",
+"gui.appliedhistory.me_logger.offline": "オフライン：このMEロガーにはAEとチャンネルが必要です。",
+"gui.appliedhistory.me_logger.conflict": "エラー：このネットワーク上に複数のMEロガーがあります。1台だけになるまで、記録は一時停止されます。",
+
+"gui.appliedhistory.me_logger.purge": "履歴を消去",
+"gui.appliedhistory.me_logger.purge.confirm": "確認",
+"gui.appliedhistory.me_logger.purge.warning": "記録されたすべての履歴を永久に削除します（a long time!）。このMEロガーは撤去され、代わりに休眠中のMEロガーがドロップします。5秒以内に再度クリックすると実行されます。",
+
+"tooltip.appliedhistory.history.detail": "%3$s前、%2$sが%1$sしました。",
+"tooltip.appliedhistory.action.imported": "インポート",
+"tooltip.appliedhistory.action.exported": "エクスポート",
+"tooltip.appliedhistory.action.requested": "リクエスト",
+
+"tooltip.appliedhistory.age.second": "%s秒",
+"tooltip.appliedhistory.age.seconds": "%s秒",
+"tooltip.appliedhistory.age.minute": "%s分",
+"tooltip.appliedhistory.age.minutes": "%s分",
+"tooltip.appliedhistory.age.hour": "%s時間",
+"tooltip.appliedhistory.age.hours": "%s時間",
+"tooltip.appliedhistory.age.day": "%s日",
+"tooltip.appliedhistory.age.days": "%s日"
 }

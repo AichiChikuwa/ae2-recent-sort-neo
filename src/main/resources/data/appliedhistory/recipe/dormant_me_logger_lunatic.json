@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "IOI",
+    "VEP",
+    "ITI"
+  ],
+  "key": {
+    "I": "#c:ingots/iron",
+    "O": "minecraft:ochre_froglight",
+    "V": "minecraft:verdant_froglight",
+    "P": "minecraft:pearlescent_froglight",
+    "E": "ae2:cell_component_16k",
+    "T": "ae2:terminal"
+  },
+  "result": {
+    "id": "appliedhistory:dormant_me_logger",
+    "count": 1,
+    "components": {
+      "appliedhistory:lunatic_origin": true
+    }
+  }
+}

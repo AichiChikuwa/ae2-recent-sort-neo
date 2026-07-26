@@ -4,17 +4,6 @@ plugins {
 
 rootProject.name = "applied-history"
 
-def ae2SourceDirCandidates = [
-    "../Applied-Energistics-2-26.1.2"
-]
-
-def ae2SourceDir = ae2SourceDirCandidates.collect { file(it) }.find { it.exists() }
-
-if (ae2SourceDir != null) {
-    includeBuild(ae2SourceDir.path) {
-        dependencySubstitution {
-            substitute(module("org.appliedenergistics:appliedenergistics2")).using(project(":"))
-        }
-    }
-}
+// use the published ae2 maven artifact (includes client classes). local includeBuild of ae2
+// only exposes the common source set and breaks client compilation for this mod.
 

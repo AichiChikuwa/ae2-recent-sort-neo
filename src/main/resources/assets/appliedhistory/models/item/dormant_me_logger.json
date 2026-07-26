@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "appliedhistory:item/dormant_me_logger"
+  }
+}

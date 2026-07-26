@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "net.meatwo310.appliedaccesssort.mixin",
+  "package": "net.aichichikuwa.appliedhistory.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "ae2.MEStorageMenuMixin",

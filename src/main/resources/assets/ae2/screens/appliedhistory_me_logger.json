@@ -1,0 +1,22 @@
+{
+  "$schema": "schema.json",
+  "includes": ["common/common.json"],
+  "generatedBackground": {
+    "width": 176,
+    "height": 96
+  },
+  "text": {
+    "dialog_title": {
+      "text": { "translate": "block.appliedhistory.me_logger" },
+      "position": { "left": 8, "top": 7 }
+    }
+  },
+  "widgets": {
+    "purge": {
+      "left": 38,
+      "top": 62,
+      "width": 100,
+      "height": 20
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "ICI",
+    "BEB",
+    "ITI"
+  ],
+  "key": {
+    "I": "#c:ingots/iron",
+    "C": "minecraft:clock",
+    "B": "minecraft:writable_book",
+    "E": "ae2:cell_component_16k",
+    "T": "ae2:terminal"
+  },
+  "result": {
+    "id": "appliedhistory:dormant_me_logger",
+    "count": 1
+  }
+}

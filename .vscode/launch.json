@@ -12,11 +12,11 @@
       "projectName": "applied-history",
       "mainClass": "net.neoforged.devlaunch.Main",
       "args": [
-        "@D:\\_AichiProjects\\repos\\AppliedAccessSort\\ae2-recent-sort-neo\\build\\moddev\\clientRunProgramArgs.txt"
+        "@C:\\_AichiProjects\\repos\\AppliedAccessSort\\ae2-recent-sort-neo\\build\\moddev\\clientRunProgramArgs.txt"
       ],
       "vmArgs": [
-        "@D:\\_AichiProjects\\repos\\AppliedAccessSort\\ae2-recent-sort-neo\\build\\moddev\\clientRunVmArgs.txt",
-        "-Dfml.modFolders\u003dappliedhistory%%D:\\_AichiProjects\\repos\\AppliedAccessSort\\ae2-recent-sort-neo\\bin\\main"
+        "@C:\\_AichiProjects\\repos\\AppliedAccessSort\\ae2-recent-sort-neo\\build\\moddev\\clientRunVmArgs.txt",
+        "-Dfml.modFolders\u003dappliedhistory%%C:\\_AichiProjects\\repos\\AppliedAccessSort\\ae2-recent-sort-neo\\bin\\main"
       ],
       "cwd": "${workspaceFolder}\\run",
       "env": {},
@@ -34,11 +34,11 @@
       "projectName": "applied-history",
       "mainClass": "net.neoforged.devlaunch.Main",
       "args": [
-        "@D:\\_AichiProjects\\repos\\AppliedAccessSort\\ae2-recent-sort-neo\\build\\moddev\\serverRunProgramArgs.txt"
+        "@C:\\_AichiProjects\\repos\\AppliedAccessSort\\ae2-recent-sort-neo\\build\\moddev\\serverRunProgramArgs.txt"
       ],
       "vmArgs": [
-        "@D:\\_AichiProjects\\repos\\AppliedAccessSort\\ae2-recent-sort-neo\\build\\moddev\\serverRunVmArgs.txt",
-        "-Dfml.modFolders\u003dappliedhistory%%D:\\_AichiProjects\\repos\\AppliedAccessSort\\ae2-recent-sort-neo\\bin\\main"
+        "@C:\\_AichiProjects\\repos\\AppliedAccessSort\\ae2-recent-sort-neo\\build\\moddev\\serverRunVmArgs.txt",
+        "-Dfml.modFolders\u003dappliedhistory%%C:\\_AichiProjects\\repos\\AppliedAccessSort\\ae2-recent-sort-neo\\bin\\main"
       ],
       "cwd": "${workspaceFolder}\\run",
       "env": {},

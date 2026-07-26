@@ -1,17 +1,50 @@
 {
-  "tooltip.appliedhistory.history": "历史",
-  "tooltip.appliedhistory.toggle.enabled": "已启用",
-  "tooltip.appliedhistory.toggle.disabled": "已禁用",
-  "tooltip.appliedhistory.history.detail": "%2$s 于 %3$s前%1$s。",
-  "tooltip.appliedhistory.action.imported": "导入",
-  "tooltip.appliedhistory.action.exported": "导出",
-  "tooltip.appliedhistory.action.requested": "请求",
-  "tooltip.appliedhistory.age.second": "%s秒",
-  "tooltip.appliedhistory.age.seconds": "%s秒",
-  "tooltip.appliedhistory.age.minute": "%s分钟",
-  "tooltip.appliedhistory.age.minutes": "%s分钟",
-  "tooltip.appliedhistory.age.hour": "%s小时",
-  "tooltip.appliedhistory.age.hours": "%s小时",
-  "tooltip.appliedhistory.age.day": "%s天",
-  "tooltip.appliedhistory.age.days": "%s天"
+"tooltip.appliedhistory.history": "历史记录",
+"tooltip.appliedhistory.toggle.enabled": "已启用",
+"tooltip.appliedhistory.toggle.disabled": "已禁用",
+"tooltip.appliedhistory.toggle.noLogger": "该网络中需要有一个 ME 记录器。",
+"tooltip.appliedhistory.toggle.conflict": "已禁用：该网络中存在多个 ME 记录器。",
+
+"block.appliedhistory.me_logger": "ME记录器",
+"item.appliedhistory.dormant_me_logger": "休眠ME记录器",
+
+"tooltip.appliedhistory.dormant_me_logger.instructions": "手持于主手，然后依次：潜行、潜行、左键点击、左键点击、潜行。",
+"tooltip.appliedhistory.me_logger.ready": "已就绪，可供部署",
+"tooltip.appliedhistory.me_logger.invalid": "此记录器尚未初始化，无法记录历史。",
+"tooltip.appliedhistory.me_logger.obtain_dormant": "通过唤醒休眠  ME 记录器获得。",
+"tooltip.appliedhistory.lunatic_origin": "费了LUNATIC的劲，但它没有任何额外功能。",
+
+"itemGroup.appliedhistory": "Applied History",
+
+"advancements.appliedhistory.root.title": "Applied History",
+"advancements.appliedhistory.root.description": "追踪你的 ME 网络历史！呱。",
+
+"advancements.appliedhistory.obtain_me_logger.title": "二拜二拍一拜",
+"advancements.appliedhistory.obtain_me_logger.description": "首次获得一个 ME 记录器。",
+
+"advancements.appliedhistory.obtain_lunatic_dormant.title": "小小青蛙不输风雨",
+"advancements.appliedhistory.obtain_lunatic_dormant.description": "克服一切困难，以难到不合理的方式合成一个休眠 ME 记录器。太LUNATIC！太NAIVE！",
+
+"gui.appliedhistory.me_logger.blank": "此记录器尚未初始化，无法记录历史。使用“清除历史记录”可回收一个能够部署的休眠 ME 记录器。",
+"gui.appliedhistory.me_logger.entries": "已记录条目：%s / %s",
+"gui.appliedhistory.me_logger.offline": "离线：此 ME 记录器需要 AE 能源和一个频道。",
+"gui.appliedhistory.me_logger.conflict": "错误：该网络中存在多个 ME 记录器。在网络中仅剩一个 ME 记录器之前，记录功能将保持暂停。",
+
+"gui.appliedhistory.me_logger.purge": "清除历史记录",
+"gui.appliedhistory.me_logger.purge.confirm": "确认清除",
+"gui.appliedhistory.me_logger.purge.warning": "这将永久删除所有已记录的历史（真的很久！），并移除此 ME 记录器。随后会掉落一个新的休眠 ME 记录器。请在 5 秒内再次点击以确认。",
+
+"tooltip.appliedhistory.history.detail": "%2$s 于 %3$s前%1$s。",
+"tooltip.appliedhistory.action.imported": "导入",
+"tooltip.appliedhistory.action.exported": "导出",
+"tooltip.appliedhistory.action.requested": "请求",
+
+"tooltip.appliedhistory.age.second": "%s 秒",
+"tooltip.appliedhistory.age.seconds": "%s 秒",
+"tooltip.appliedhistory.age.minute": "%s 分钟",
+"tooltip.appliedhistory.age.minutes": "%s 分钟",
+"tooltip.appliedhistory.age.hour": "%s 小时",
+"tooltip.appliedhistory.age.hours": "%s 小时",
+"tooltip.appliedhistory.age.day": "%s 天",
+"tooltip.appliedhistory.age.days": "%s 天"
 }
