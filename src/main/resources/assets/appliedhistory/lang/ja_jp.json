@@ -12,7 +12,7 @@
 "tooltip.appliedhistory.me_logger.ready": "準備完了",
 "tooltip.appliedhistory.me_logger.invalid": "このロガーは初期化されていないため、履歴を記録できません。",
 "tooltip.appliedhistory.me_logger.obtain_dormant": "休眠中のMEロガーを目覚めさせることで入手できます。",
-"tooltip.appliedhistory.lunatic_origin": "LUNATICの苦労をしたというのに、追加機能は何もありません。",
+"tooltip.appliedhistory.lunatic_origin": "LUNATICの苦労したのに、追加機能は何もありません。",
 
 "itemGroup.appliedhistory": "Applied History",
 
@@ -32,7 +32,7 @@
 
 "gui.appliedhistory.me_logger.purge": "履歴を消去",
 "gui.appliedhistory.me_logger.purge.confirm": "確認",
-"gui.appliedhistory.me_logger.purge.warning": "記録されたすべての履歴を永久に削除します（a long time!）。このMEロガーは撤去され、代わりに休眠中のMEロガーがドロップします。5秒以内にもう一度クリックすると確認されます。",
+"gui.appliedhistory.me_logger.purge.warning": "記録されたすべての履歴を永久に削除します（a long time!）。このMEロガーは撤去され、代わりに休眠中のMEロガーがドロップします。5秒以内に再度クリックすると実行されます。",
 
 "tooltip.appliedhistory.history.detail": "%3$s前、%2$sが%1$sしました。",
 "tooltip.appliedhistory.action.imported": "インポート",
